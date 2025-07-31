@@ -1,7 +1,9 @@
 package com.sonder.yunpicturebackend.controller;
 
+import com.sonder.yunpicturebackend.annotation.AuthCheck;
 import com.sonder.yunpicturebackend.common.BaseResponse;
 import com.sonder.yunpicturebackend.common.ResultUtils;
+import com.sonder.yunpicturebackend.constant.UserConstant;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
 import com.sonder.yunpicturebackend.model.dto.UserLoginRequest;
