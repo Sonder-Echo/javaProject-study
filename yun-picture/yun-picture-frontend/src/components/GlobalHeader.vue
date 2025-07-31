@@ -56,7 +56,7 @@ const items = ref<MenuProps['items']>([
     key: 'others',
     label: h(
       'a',
-      { href: 'https://github.com/Sonder-Echo/javaProject-study', target: '_blank' },
+      { href: 'https://github.com/Sonder-Echo/javaProject-study/tree/master/yun-picture', target: '_blank' },
       'Git-Hub',
     ),
     title: 'Git-Hub',

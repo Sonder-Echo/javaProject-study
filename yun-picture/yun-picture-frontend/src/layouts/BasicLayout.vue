@@ -8,7 +8,7 @@
         <router-view></router-view>
       </a-layout-content>
       <a-layout-footer class="footer">
-        <a href="https://github.com/Sonder-Echo/javaProject-study" target="_blank"> Git-Hub by Sonder </a>
+        <a href="https://github.com/Sonder-Echo/javaProject-study/tree/master/yun-picture" target="_blank"> Git-Hub by Sonder </a>
       </a-layout-footer>
     </a-layout>
   </div>
