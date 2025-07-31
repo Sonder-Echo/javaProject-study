@@ -92,11 +92,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-        //4.用户信息脱敏
-        LoginUserVO loginUserVO = getLoginUserVO(user);
-        //5.保存用户登录态
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, loginUserVO);
-        return loginUserVO;
+        //4.保存用户登录态
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        //5.用户信息脱敏
+        return getLoginUserVO(user);
     }
 
     @Override
@@ -112,6 +111,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //加盐，混淆密码
         final String SALT = "sonder";
         return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        //判断是否登录
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if(currentUser == null || currentUser.getId() == null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        //从数据库中查询用户（追求性能的话可以直接返回）
+        Long userId = currentUser.getId();
+        currentUser = this.getById(userId);
+        if(currentUser == null){
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        return currentUser;
     }
 }
 

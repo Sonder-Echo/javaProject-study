@@ -6,6 +6,7 @@ import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
 import com.sonder.yunpicturebackend.model.dto.UserLoginRequest;
 import com.sonder.yunpicturebackend.model.dto.UserRegisterRequest;
+import com.sonder.yunpicturebackend.model.entity.User;
 import com.sonder.yunpicturebackend.model.vo.LoginUserVO;
 import com.sonder.yunpicturebackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,14 @@ public class UserController {
         String userPassword = userLoginRequest.getUserPassword();
         LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVO);
+    }
+
+    /**
+     * 获取当前登录用户
+     */
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(user));
     }
 }
