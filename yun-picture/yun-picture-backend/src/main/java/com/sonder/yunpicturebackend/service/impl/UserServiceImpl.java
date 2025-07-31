@@ -1,18 +1,23 @@
 package com.sonder.yunpicturebackend.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sonder.yunpicturebackend.constant.UserConstant;
 import com.sonder.yunpicturebackend.exception.BusinessException;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.model.dto.UserRegisterRequest;
 import com.sonder.yunpicturebackend.model.entity.User;
 import com.sonder.yunpicturebackend.model.enums.UserRoleEnum;
+import com.sonder.yunpicturebackend.model.vo.LoginUserVO;
 import com.sonder.yunpicturebackend.service.UserService;
 import com.sonder.yunpicturebackend.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author Sonder
@@ -20,6 +25,7 @@ import org.springframework.util.DigestUtils;
 * @createDate 2025-07-31 20:46:47
 */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
 
@@ -61,6 +67,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败");
         }
         return user.getId();
+    }
+
+    @Override
+    public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
+        //1.校验
+        if(StrUtil.hasBlank(userAccount,userPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        if(userAccount.length() < 4){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账户错误");
+        }
+        if(userPassword.length() < 8){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码错误");
+        }
+        //2.对用户传递的密码加密
+        String encryptPassword = getEncryptPassword(userPassword);
+        //3.查询用户是否存在
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAccount);
+        queryWrapper.eq("userPassword", encryptPassword);
+        User user = this.baseMapper.selectOne(queryWrapper);
+        if(user == null){
+            log.info("user login failed, userAccount cannot match userPassword");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+        //4.用户信息脱敏
+        LoginUserVO loginUserVO = getLoginUserVO(user);
+        //5.保存用户登录态
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, loginUserVO);
+        return loginUserVO;
+    }
+
+    @Override
+    public LoginUserVO getLoginUserVO(User user) {
+        if(user == null){
+            return null;
+        }
+        return BeanUtil.copyProperties(user, LoginUserVO.class);
     }
 
     @Override
