@@ -18,7 +18,7 @@
         />
       </a-col>
       <!-- 用户信息展示 -->
-      <a-col flex="120px">
+      <a-col flex="150px">
         <div class="user-login-status">
           <div v-if="loginUserStore.loginUser.id">
             <a-dropdown>
@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { h, ref } from 'vue'
+import { computed, h, ref } from 'vue'
 import { HomeOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -66,7 +66,8 @@ import { userLogoutUsingPost } from '@/api/userController.ts'
 
 const loginUserStore = useLoginUserStore()
 
-const items = ref<MenuProps['items']>([
+// 未经过滤的菜单项
+const originItems = [
   {
     key: '/',
     icon: () => h(HomeOutlined),
@@ -90,7 +91,24 @@ const items = ref<MenuProps['items']>([
     ),
     title: 'Git-Hub',
   },
-])
+]
+
+//根据权限过滤菜单项
+const filterMenus = (menus = [] as MenuProps['items']) => {
+  return menus?.filter(((menu) => {
+    // 只有管理员才能看到 /admin 开头的管理菜单
+    if(menu.key.startsWith('/admin')){
+      const loginUser = loginUserStore.loginUser;
+      if(!loginUser.userRole || loginUser.userRole !== 'admin'){
+        return false;
+      }
+    }
+    return true;
+  }))
+}
+
+// 展示在菜单栏的菜单项
+const items = computed(() => filterMenus(originItems))
 
 const router = useRouter()
 //路由跳转事件
