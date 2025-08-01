@@ -5,8 +5,8 @@ import App from './App.vue'
 import router from './router'
 import Antd from "ant-design-vue";
 import "ant-design-vue/dist/reset.css";
+import "@/access.ts"
 
-import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'  // 引入 dayjs 中文语言包
 
