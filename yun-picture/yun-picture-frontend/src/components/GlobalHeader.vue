@@ -17,13 +17,38 @@
           @click="doMenuClick"
         />
       </a-col>
+      <!-- 用户信息展示 -->
       <a-col flex="120px">
         <div class="user-login-status">
           <div v-if="loginUserStore.loginUser.id">
-            {{ loginUserStore.loginUser.userName ?? '无名'}}
+            <a-dropdown>
+              <a-space>
+                <a-avatar
+                  :src="
+                loginUserStore.loginUser.userAvatar ??
+                'https://sonder-java-ai.oss-cn-beijing.aliyuncs.com/2025/06/4ea73cc9-0893-43b3-9d97-54b34cb83404.jpg'
+              "
+                />
+                {{ loginUserStore.loginUser.userName ?? 'LaLa' }}
+              </a-space>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="doLogout">
+                    <LogoutOutlined />
+                    退出登录
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </div>
           <div v-else>
-            <a-button type="primary" href="/user/login"> 登录 </a-button>
+            <a-button
+              type=" primary
+            "
+              href="/user/login"
+            >
+              登录
+            </a-button>
           </div>
         </div>
       </a-col>
@@ -33,10 +58,11 @@
 
 <script lang="ts" setup>
 import { h, ref } from 'vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
-import { MenuProps } from 'ant-design-vue'
+import { HomeOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import { userLogoutUsingPost } from '@/api/userController.ts'
 
 const loginUserStore = useLoginUserStore()
 
@@ -56,7 +82,10 @@ const items = ref<MenuProps['items']>([
     key: 'others',
     label: h(
       'a',
-      { href: 'https://github.com/Sonder-Echo/javaProject-study/tree/master/yun-picture', target: '_blank' },
+      {
+        href: 'https://github.com/Sonder-Echo/javaProject-study/tree/master/yun-picture',
+        target: '_blank',
+      },
       'Git-Hub',
     ),
     title: 'Git-Hub',
@@ -77,6 +106,20 @@ const current = ref<string[]>([])
 router.afterEach((to, from, next) => {
   current.value = [to.path]
 })
+
+// 用户注销
+const doLogout = async () => {
+  const res = await userLogoutUsingPost();
+  if (res.data.code === 0) {
+    loginUserStore.setLoginUser({
+      userName: '未登录',
+    })
+    message.success('退出登录成功')
+    await router.push('/user/login')
+  } else {
+    message.error('退出登录失败,' + res.data.message)
+  }
+}
 </script>
 
 <style scoped>
