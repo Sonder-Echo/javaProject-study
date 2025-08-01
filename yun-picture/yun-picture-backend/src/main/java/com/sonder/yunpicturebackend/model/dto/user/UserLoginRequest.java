@@ -1,4 +1,4 @@
-package com.sonder.yunpicturebackend.model.dto;
+package com.sonder.yunpicturebackend.model.dto.user;
 
 import lombok.Data;
 
