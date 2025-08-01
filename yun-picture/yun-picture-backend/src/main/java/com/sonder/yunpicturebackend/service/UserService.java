@@ -1,11 +1,16 @@
 package com.sonder.yunpicturebackend.service;
 
-import com.sonder.yunpicturebackend.model.dto.UserRegisterRequest;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.sonder.yunpicturebackend.model.dto.user.UserQueryRequest;
+import com.sonder.yunpicturebackend.model.dto.user.UserRegisterRequest;
 import com.sonder.yunpicturebackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonder.yunpicturebackend.model.vo.LoginUserVO;
+import com.sonder.yunpicturebackend.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author Sonder
@@ -39,6 +44,20 @@ public interface UserService extends IService<User> {
     LoginUserVO getLoginUserVO(User user);
 
     /**
+     * 获取脱敏后的用户信息
+     * @param user  用户实体类
+     * @return  脱敏后的用户信息
+     */
+    UserVO getUserVO(User user);
+
+    /**
+     * 获取脱敏后的用户信息列表
+     * @param userList  用户实体类列表
+     * @return  脱敏后的用户信息列表
+     */
+    List<UserVO> getUserVOList(List<User> userList);
+
+    /**
      * 获取加密密码
      * @param userPassword  用户输入的密码
      * @return  加密后的密码
@@ -57,4 +76,11 @@ public interface UserService extends IService<User> {
      * @param request   http请求
      */
     boolean userLogout(HttpServletRequest request);
+
+    /**
+     * 获取查询条件（将java对象转化为Mybatis需要的QueryWrapper）
+     * @param userQueryRequest  对象
+     * @return
+     */
+    QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 }
