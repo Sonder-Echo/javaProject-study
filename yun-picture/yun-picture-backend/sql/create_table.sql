@@ -23,7 +23,6 @@ create table if not exists user
 ) comment '用户' collate = utf8mb4_unicode_ci;
 
 -- 图片表
--- 图片表
 create table if not exists picture
 (
     id           bigint auto_increment comment 'id' primary key,
