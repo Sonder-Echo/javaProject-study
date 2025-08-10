@@ -1,5 +1,6 @@
 ### 自定义
-application-local.yaml
+application-local.yml
+application-dev.yml
 
 
 HELP.md
@@ -23,7 +24,6 @@ target/
 *.iml
 *.ipr
 
-application-dev.yml
 
 ### NetBeans ###
 /nbproject/private/
