@@ -109,7 +109,6 @@ const tagOptions = ref<string[]>([])
  */
 const getTagCategoryOptions = async () => {
   const res = await listPictureTagCategoryUsingGet()
-  // 操作成功
   if (res.data.code === 0 && res.data.data) {
     tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
       return {
@@ -124,8 +123,7 @@ const getTagCategoryOptions = async () => {
       }
     })
   } else {
-    // 创建失败
-    message.error('获取失败，' + res.data.message)
+    message.error('获取标签分类列表失败，' + res.data.message)
   }
 }
 
