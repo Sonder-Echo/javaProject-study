@@ -4,7 +4,7 @@
     <!-- 图片上传组件 -->
     <PictureUpload :picture="picture" :onSuccess="onSuccess" />
     <!-- 图片信息表单 -->
-    <a-form name="pictureForm" layout="vertical" :model="pictureForm" @finish="handleSubmit">
+    <a-form v-if="picture" name="pictureForm" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item name="name" label="名称">
         <a-input v-model:value="pictureForm.name" placeholder="请输入图片名称" allow-clear />
       </a-form-item>
@@ -12,7 +12,7 @@
         <a-textarea
           v-model:value="pictureForm.introduction"
           placeholder="请输入图片简介"
-          :autoSize="{ minRows: 2, maxRows: 5}"
+          :autoSize="{ minRows: 2, maxRows: 5 }"
           allow-clear
         />
       </a-form-item>
@@ -20,6 +20,7 @@
         <a-auto-complete
           v-model:value="pictureForm.category"
           placeholder="请输入图片分类"
+          :options="categoryOptions"
           allow-clear
         />
       </a-form-item>
@@ -27,7 +28,10 @@
         <a-select
           v-model:value="pictureForm.tags"
           mode="tags"
-          placeholder="请输入图片标签">
+          placeholder="请输入图片标签"
+          :options="tagOptions"
+          allow-clear
+        >
         </a-select>
       </a-form-item>
       <a-form-item>
@@ -39,10 +43,10 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { userLoginUsingPost } from '@/api/userController.ts'
 import { message } from 'ant-design-vue'
-import { editPictureUsingPost } from '@/api/pictureController.ts'
+import { editPictureUsingPost, listPictureTagCategoryUsingGet } from '@/api/pictureController.ts'
 import { useRouter } from 'vue-router'
 
 const picture = ref<API.PictureVO>()
@@ -57,7 +61,7 @@ const onSuccess = (newPicture: API.PictureVO) => {
   pictureForm.name = newPicture.name
 }
 
-const router = useRouter();
+const router = useRouter()
 
 /**
  * 提交表单
@@ -80,7 +84,7 @@ const handleSubmit = async (values: any) => {
       message.success('创建成功')
       // 跳转到图片详情页面
       router.push({
-        path: `/picture/${pictureId}`
+        path: `/picture/${pictureId}`,
       })
     } else {
       // 创建失败
@@ -90,6 +94,38 @@ const handleSubmit = async (values: any) => {
     message.error('创建失败，' + e.message)
   }
 }
+
+const categoryOptions = ref<string[]>([])
+const tagOptions = ref<string[]>([])
+/**
+ * 获取标签和分类选项
+ * @param values
+ */
+const getTagCategoryOptions = async () => {
+  const res = await listPictureTagCategoryUsingGet()
+  // 操作成功
+  if (res.data.code === 0 && res.data.data) {
+    tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
+      return {
+        value: data,
+        label: data,
+      }
+    })
+    categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => {
+      return {
+        value: data,
+        label: data,
+      }
+    })
+  } else {
+    // 创建失败
+    message.error('获取失败，' + res.data.message)
+  }
+}
+
+onMounted(() => {
+  getTagCategoryOptions()
+})
 </script>
 
 <style scoped>
