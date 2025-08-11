@@ -49,6 +49,12 @@
           </a-descriptions>
           <!-- 图片操作 --->
           <a-space wrap>
+            <a-button type="primary" @click="doDownload">
+              免费下载
+              <template #icon>
+                <DownloadOutlined />
+              </template>
+            </a-button>
             <a-button v-if="canEdit" :icon="h(EditOutlined)" type="default" @click="doEdit">
               编辑</a-button
             >
@@ -66,8 +72,8 @@
 import { onMounted, ref, h, computed } from 'vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { formatSize } from '@/utils/indes.ts'
+import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons-vue'
+import { downloadImage, formatSize } from '@/utils/indes.ts'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { useRouter } from 'vue-router'
 
@@ -114,6 +120,11 @@ onMounted(() => {
 
 const router = useRouter()
 
+
+// 下载图片
+const doDownload = () => {
+  downloadImage(picture.value.url)
+}
 // 编辑
 const doEdit = () => {
   router.push('/add_picture?id=' + picture.value.id)
