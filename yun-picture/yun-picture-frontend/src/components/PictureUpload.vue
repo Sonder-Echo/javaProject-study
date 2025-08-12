@@ -10,7 +10,7 @@
       <div v-else>
         <loading-outlined v-if="loading"></loading-outlined>
         <plus-outlined v-else></plus-outlined>
-        <div class="ant-upload-text">点击或拖拽上传</div>
+        <div class="ant-upload-text">点击或拖拽上传图片</div>
       </div>
     </a-upload>
  </div>
