@@ -3,6 +3,7 @@ package com.sonder.yunpicturebackend.model.dto.picture;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 批量导入图片请求

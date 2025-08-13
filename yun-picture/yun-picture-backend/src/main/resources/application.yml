@@ -3,7 +3,6 @@ server:
   servlet:
     # 上下文路径: localhost:8081/api
     context-path: /api
-
 spring:
   application:
     name: yun-picture
@@ -13,10 +12,18 @@ spring:
     url: jdbc:mysql://localhost:3306/yun_picture
     username: root
     password: 1234
+  # Redis 配置
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    timeout: 5000
+    password: 1234
   # 开放更大的文件上传体积
   servlet:
     multipart:
       max-file-size: 10MB
+
 mybatis-plus:
   configuration:
     # 取消下划线转驼峰
