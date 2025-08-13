@@ -44,14 +44,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
-* @author Sonder
-* @description 针对表【picture(图片)】的数据库操作Service实现
-* @createDate 2025-08-06 20:18:49
-*/
+ * @author Sonder
+ * @description 针对表【picture(图片)】的数据库操作Service实现
+ * @createDate 2025-08-06 20:18:49
+ */
 @Slf4j
 @Service
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
-    implements PictureService {
+        implements PictureService {
 
     @Resource
     private FileManager fileManager;
@@ -95,11 +95,11 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             pictureId = pictureUploadRequest.getId();
         }
         // 如果是更新，判断图片是否存在
-        if(pictureId != null){
+        if (pictureId != null) {
             Picture oldPicture = this.getById(pictureId);
             ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR, "图片不存在");
             // 仅本人或管理员可编辑图片
-            if(!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)){
+            if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
             }
         }
@@ -108,16 +108,17 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String uploadPathPrefix = String.format("public/%s", loginUser.getId());
         // 根据 inputSource 的类型区分上传方式
         PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
-        if(inputSource instanceof String){
+        if (inputSource instanceof String) {
             pictureUploadTemplate = urlPictureUpload;
         }
         UploadPictureResult uploadPictureResult = pictureUploadTemplate.uploadPicture(inputSource, uploadPathPrefix);
         // 构造要入库的图片信息
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
+        picture.setThumbnailUrl(uploadPictureResult.getThumbnailUrl());
         // 支持外层传递图片名称
         String picName = uploadPictureResult.getPicName();
-        if(pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())){
+        if (pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())) {
             picName = pictureUploadRequest.getPicName();
         }
         picture.setName(picName);
@@ -131,7 +132,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         this.fillReviewParams(picture, loginUser);
         // 操作数据库
         // 如果 pictureId不为空，则更新，否则插入
-        if(pictureId != null){
+        if (pictureId != null) {
             // 更新操作需要补充 id 和编辑时间
             picture.setId(pictureId);
             picture.setEditTime(new Date());
@@ -157,13 +158,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     /**
      * 分页获取图片封装
+     *
      * @return
      */
     @Override
-    public Page<PictureVO> getPictureVOPage(Page<Picture> picturePage, HttpServletRequest request){
+    public Page<PictureVO> getPictureVOPage(Page<Picture> picturePage, HttpServletRequest request) {
         List<Picture> pictureList = picturePage.getRecords();
         Page<PictureVO> pictureVOPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(), picturePage.getTotal());
-        if(CollUtil.isEmpty(pictureList)){
+        if (CollUtil.isEmpty(pictureList)) {
             return pictureVOPage;
         }
 
@@ -177,7 +179,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         pictureVOList.forEach(pictureVO -> {
             Long userId = pictureVO.getUserId();
             User user = null;
-            if(userIdUserListMap.containsKey(userId)){
+            if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
             pictureVO.setUser(userService.getUserVO(user));
@@ -252,14 +254,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer reviewStatus = pictureReviewRequest.getReviewStatus();
         PictureReviewStatusEnum reviewStatusEnum = PictureReviewStatusEnum.getEnumByValue(reviewStatus);
         String reviewMessage = pictureReviewRequest.getReviewMessage();
-        if(id == null || reviewStatusEnum == null || PictureReviewStatusEnum.REVIEWING.equals(reviewStatusEnum)){
+        if (id == null || reviewStatusEnum == null || PictureReviewStatusEnum.REVIEWING.equals(reviewStatusEnum)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 2.判断图片是否存在
         Picture oldPicture = this.getById(id);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
         // 3.校验审核状态是否重复
-        if(oldPicture.getReviewStatus().equals(reviewStatus)){
+        if (oldPicture.getReviewStatus().equals(reviewStatus)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请勿重复审核");
         }
         // 4.数据库操作
@@ -273,18 +275,19 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     /**
      * 填充审核参数
+     *
      * @param picture
      * @param loginUser
      */
     @Override
     public void fillReviewParams(Picture picture, User loginUser) {
-        if(userService.isAdmin(loginUser)){
+        if (userService.isAdmin(loginUser)) {
             // 管理员自动过审
             picture.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
             picture.setReviewerId(loginUser.getId());
             picture.setReviewMessage("管理员自动过审");
             picture.setReviewTime(new Date());
-        } else{
+        } else {
             // 非管理员，无论是编辑还是创建默认都是待审核
             picture.setReviewStatus(PictureReviewStatusEnum.REVIEWING.getValue());
         }
@@ -297,7 +300,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer count = pictureUploadByBatchRequest.getCount();
         // 名称前缀默认为搜索关键词
         String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
-        if(StrUtil.isBlank(namePrefix)){
+        if (StrUtil.isBlank(namePrefix)) {
             namePrefix = searchText;
         }
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "一次最多 30 条");
@@ -333,14 +336,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
             pictureUploadRequest.setFileUrl(fileUrl);
             pictureUploadRequest.setPicName(namePrefix + (uploadCount + 1));
-            try{
+            try {
                 PictureVO pictureVO = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
                 log.info("第{}条处理【成功】：id = {}", uploadCount + 1, pictureVO.getId());
                 ++uploadCount;
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.info("图片上传失败：{}", fileUrl);
             }
-            if(uploadCount >= count){
+            if (uploadCount >= count) {
                 break;
             }
         }
