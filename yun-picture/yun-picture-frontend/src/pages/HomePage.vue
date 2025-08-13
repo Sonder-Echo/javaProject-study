@@ -40,7 +40,7 @@
           <!-- 单张图片 --->
           <a-card hoverable @click="doClickPicture(picture)">
             <template #cover>
-              <img :alt="picture.name" :src="picture.url"
+              <img :alt="picture.name" :src="picture.thumbnailUrl ?? picture.url"
 
               style="height: 180px; object-fit: cover"/>
             </template>
