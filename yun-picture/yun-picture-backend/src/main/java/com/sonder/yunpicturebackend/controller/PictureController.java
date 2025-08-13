@@ -3,9 +3,8 @@ package com.sonder.yunpicturebackend.controller;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.COSObjectInputStream;
-import com.qcloud.cos.utils.IOUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.sonder.yunpicturebackend.annotation.AuthCheck;
 import com.sonder.yunpicturebackend.common.BaseResponse;
 import com.sonder.yunpicturebackend.common.DeleteRequest;
@@ -53,6 +52,18 @@ public class PictureController {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 本地缓存
+     */
+    private final Cache<String, String> LOCAL_CACHE =
+            Caffeine.newBuilder()
+                    .initialCapacity(1024)
+                    .maximumSize(10000L) // 最大 10000 条数据
+                    // 缓存 5 分钟移除
+                    .expireAfterWrite(5L, TimeUnit.MINUTES)
+                    .build();
+
 
     /**
      * 上传图片（可重新上传）
@@ -226,10 +237,12 @@ public class PictureController {
         // 构建缓存的key
         String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
         String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
-        String redisKey = String.format("yunpicture:listPictureVOByPage:%s", hashKey);
+        String cacheKey = String.format("yunpicture:listPictureVOByPage:%s", hashKey);
         // 操作 Redis 从缓存中查询
-        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
-        String cachedValue = opsForValue.get(redisKey);
+//        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+//        String cachedValue = opsForValue.get(cacheKey);
+        // 使用本地缓存
+        String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);
         if(cachedValue != null){
             // 如果缓存命中，缓存结果
             Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
@@ -244,7 +257,9 @@ public class PictureController {
         String cacheValue = JSONUtil.toJsonStr(pictureVOPage);
         // 设置缓存过期时间， 5-10 分钟， 避免缓存雪崩
         int cacheExpireTime = 300 + RandomUtil.randomInt(0, 300);
-        opsForValue.set(redisKey, cacheValue, cacheExpireTime, TimeUnit.SECONDS);
+//        opsForValue.set(cacheKey, cacheValue, cacheExpireTime, TimeUnit.SECONDS);
+        // 写入本地缓存，不用担心雪崩
+        LOCAL_CACHE.put(cacheKey, cacheValue);
         // 获取封装类
         return ResultUtils.success(pictureVOPage);
     }
