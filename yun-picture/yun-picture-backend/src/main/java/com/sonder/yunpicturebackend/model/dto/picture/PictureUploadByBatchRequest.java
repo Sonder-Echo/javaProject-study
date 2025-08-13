@@ -23,7 +23,7 @@ public class PictureUploadByBatchRequest implements Serializable {
     /**
      * 图片名称前缀, 默认为搜索词
      */
-    private String namePrefix = this.searchText;
+    private String namePrefix;
 
     private static final long serialVersionUID = 1L;
 }

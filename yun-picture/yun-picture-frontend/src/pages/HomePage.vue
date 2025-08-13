@@ -33,7 +33,7 @@
       :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 5, xxl: 6 }"
       :data-source="dataList"
       :pagination="pagination"
-      :lodding="lodding"
+      :loading="loading"
     >
       <template #renderItem="{ item: picture }">
         <a-list-item style="padding: 0">
@@ -77,17 +77,24 @@ const loading = ref(true)
 // 搜索条件
 const searchParams = reactive<API.PictureQueryRequest>({
   current: 1,
-  pageSize: 12,
+  pageSize: 15,
   sortField: 'createTime',
   sortOrder: 'descend',
 })
 
-// 监听分页参数变化，重新获取数据
-const doTableChange = (page: any) => {
-  searchParams.current = page.current
-  searchParams.pageSize = page.pageSize
-  fetchData()
-}
+// 分页参数
+const pagination = computed(() => {
+  return {
+    current: searchParams.current,
+    pageSize: searchParams.pageSize,
+    total: total.value,
+    onChange: (page: number, pageSize: number) => {
+      searchParams.current = page
+      searchParams.pageSize = pageSize
+      fetchData()
+    },
+  }
+})
 
 // 获取数据
 const fetchData = async () => {
@@ -121,18 +128,6 @@ onMounted(() => {
   fetchData()
 })
 
-// 分页参数
-const pagination = computed(() => {
-  return {
-    current: searchParams.current,
-    pageSize: searchParams.pageSize,
-    total: total.value,
-    onChange: (page: number, pageSize: number) => {
-      searchParams.current = page
-      searchParams.pageSize = pageSize
-    },
-  }
-})
 
 // 搜索
 const doSearch = () => {

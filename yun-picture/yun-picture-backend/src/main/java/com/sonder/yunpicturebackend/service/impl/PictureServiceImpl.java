@@ -297,6 +297,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer count = pictureUploadByBatchRequest.getCount();
         // 名称前缀默认为搜索关键词
         String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
+        if(StrUtil.isBlank(namePrefix)){
+            namePrefix = searchText;
+        }
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "一次最多 30 条");
         // 抓取内容
         String fetchUrl = String.format("https://cn.bing.com/images/async?q=%s&mmasync=1", searchText);
