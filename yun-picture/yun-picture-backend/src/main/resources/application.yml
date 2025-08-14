@@ -3,6 +3,10 @@ server:
   servlet:
     # 上下文路径: localhost:8081/api
     context-path: /api
+    # cookie 30 天过期
+    session:
+      cookie:
+        max-age: 2592000
 spring:
   application:
     name: yun-picture
@@ -19,6 +23,11 @@ spring:
     port: 6379
     timeout: 5000
     password: 1234
+  # Session 配置
+  session:
+    store-type: redis
+    # session 30 天后过期
+    timeout: 2592000
   # 开放更大的文件上传体积
   servlet:
     multipart:
