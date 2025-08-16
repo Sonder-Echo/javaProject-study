@@ -48,9 +48,14 @@ public class SpaceVO implements Serializable {
     private Long totalCount;
 
     /**
-     * 创建用户 id
+     * 用户 id
      */
     private Long userId;
+
+    /**
+     * 空间 id
+     */
+    private Long spaceId;
 
     /**
      * 创建时间
