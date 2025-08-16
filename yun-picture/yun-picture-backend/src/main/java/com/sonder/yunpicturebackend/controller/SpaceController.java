@@ -17,6 +17,7 @@ import com.sonder.yunpicturebackend.model.dto.space.*;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.User;
 
+import com.sonder.yunpicturebackend.model.enums.SpaceLevelEnum;
 import com.sonder.yunpicturebackend.model.vo.SpaceVO;
 import com.sonder.yunpicturebackend.service.SpaceService;
 import com.sonder.yunpicturebackend.service.UserService;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -201,6 +203,24 @@ public class SpaceController {
         boolean result = spaceService.updateById(space);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+    }
+
+    /**
+     * 获取空间级别列表，便于前端提示
+     * @return
+     */
+    @GetMapping("/list/level")
+    public BaseResponse<List<SpaceLevel>> listSpaceLevel(){
+        List<SpaceLevel> spaceLevelList = Arrays.stream(SpaceLevelEnum.values())
+                .map(spaceLevelEnum -> new SpaceLevel(
+                        spaceLevelEnum.getValue(),
+                        spaceLevelEnum.getText(),
+                        spaceLevelEnum.getMaxCount(),
+                        spaceLevelEnum.getMaxSize()
+
+                ))
+                .collect(Collectors.toList());
+        return ResultUtils.success(spaceLevelList);
     }
 
 }
