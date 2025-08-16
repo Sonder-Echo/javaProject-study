@@ -25,14 +25,20 @@
               <a-space>
                 <a-avatar
                   :src="
-                loginUserStore.loginUser.userAvatar ??
-                'https://sonder-java-ai.oss-cn-beijing.aliyuncs.com/2025/06/4ea73cc9-0893-43b3-9d97-54b34cb83404.jpg'
-              "
+                    loginUserStore.loginUser.userAvatar ??
+                    'https://sonder-java-ai.oss-cn-beijing.aliyuncs.com/2025/06/4ea73cc9-0893-43b3-9d97-54b34cb83404.jpg'
+                  "
                 />
                 {{ loginUserStore.loginUser.userName ?? 'LaLa' }}
               </a-space>
               <template #overlay>
                 <a-menu>
+                  <a-menu-item>
+                    <router-link to="/my_space">
+                      <UserOutlined />
+                      我的空间
+                    </router-link>
+                  </a-menu-item>
                   <a-menu-item @click="doLogout">
                     <LogoutOutlined />
                     退出登录
@@ -42,13 +48,7 @@
             </a-dropdown>
           </div>
           <div v-else>
-            <a-button
-              type=" primary
-            "
-              href="/user/login"
-            >
-              登录
-            </a-button>
+            <a-button type="primary" href="/user/login"> 登录</a-button>
           </div>
         </div>
       </a-col>
@@ -58,7 +58,7 @@
 
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -90,6 +90,11 @@ const originItems = [
     title: '图片管理',
   },
   {
+    key: '/admin/spaceManage',
+    label: '空间管理',
+    title: '空间管理',
+  },
+  {
     key: 'others',
     label: h(
       'a',
@@ -105,16 +110,16 @@ const originItems = [
 
 //根据权限过滤菜单项
 const filterMenus = (menus = [] as MenuProps['items']) => {
-  return menus?.filter(((menu) => {
+  return menus?.filter((menu) => {
     // 只有管理员才能看到 /admin 开头的管理菜单
-    if(menu.key.startsWith('/admin')){
-      const loginUser = loginUserStore.loginUser;
-      if(!loginUser.userRole || loginUser.userRole !== 'admin'){
-        return false;
+    if (menu.key.startsWith('/admin')) {
+      const loginUser = loginUserStore.loginUser
+      if (!loginUser.userRole || loginUser.userRole !== 'admin') {
+        return false
       }
     }
-    return true;
-  }))
+    return true
+  })
 }
 
 // 展示在菜单栏的菜单项
@@ -137,7 +142,7 @@ router.afterEach((to, from, next) => {
 
 // 用户注销
 const doLogout = async () => {
-  const res = await userLogoutUsingPost();
+  const res = await userLogoutUsingPost()
   if (res.data.code === 0) {
     loginUserStore.setLoginUser({
       userName: '未登录',
