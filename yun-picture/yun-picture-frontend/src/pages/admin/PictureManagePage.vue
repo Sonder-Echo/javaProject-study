@@ -172,6 +172,11 @@ const columns = [
     width: 80,
   },
   {
+    title: '空间 id',
+    dataIndex: 'spaceId',
+    width: 80,
+  },
+  {
     title: '审核信息',
     dataIndex: 'reviewMessage',
   },
@@ -203,6 +208,7 @@ const doTableChange = (page: any) => {
 // 获取数据
 const fetchData = async () => {
   const res = await listPictureByPageUsingPost({
+    nullSpaceId: true,
     ...searchParams,
   })
   if (res.data.code === 0 && res.data.data) {

@@ -1,22 +1,31 @@
 <template>
   <div id="addPicturePage">
     <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '编辑图片' : '创建图片'}}
+      {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank"> {{ spaceId }} </a>
+    </a-typography-paragraph>
     <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType">
       <a-tab-pane key="file" tab="文件上传">
         <!-- 图片上传组件 -->
-        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
         <!-- URL 图片上传组件 -->
-        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
       </a-tab-pane>
     </a-tabs>
 
     <!-- 图片信息表单 -->
-    <a-form v-if="picture" name="pictureForm" layout="vertical" :model="pictureForm" @finish="handleSubmit">
+    <a-form
+      v-if="picture"
+      name="pictureForm"
+      layout="vertical"
+      :model="pictureForm"
+      @finish="handleSubmit"
+    >
       <a-form-item name="name" label="名称">
         <a-input v-model:value="pictureForm.name" placeholder="请输入图片名称" allow-clear />
       </a-form-item>
@@ -55,21 +64,26 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { onMounted, reactive, ref } from 'vue'
-import { userLoginUsingPost } from '@/api/userController.ts'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
   editPictureUsingPost,
   getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet
+  listPictureTagCategoryUsingGet,
 } from '@/api/pictureController.ts'
 import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 
+const router = useRouter()
+const route = useRoute()
+
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
-const uploadType = ref<'file' | 'url'>('file');
-
+const uploadType = ref<'file' | 'url'>('file')
+// 空间 id
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 /**
  * 图片上传成功
  * @param newPicture
@@ -78,8 +92,6 @@ const onSuccess = (newPicture: API.PictureVO) => {
   picture.value = newPicture
   pictureForm.name = newPicture.name
 }
-
-const router = useRouter()
 
 /**
  * 提交表单
@@ -94,6 +106,7 @@ const handleSubmit = async (values: any) => {
   try {
     const res = await editPictureUsingPost({
       id: pictureId,
+      spaceId: spaceId.value,
       ...values, // ...可以将对象的每个值拷贝到新的对象中
     })
     // 操作成功
@@ -143,18 +156,16 @@ onMounted(() => {
   getTagCategoryOptions()
 })
 
-const route = useRoute()
-
 // 获取老数据
 const getOldPicture = async () => {
   // 获取id
   const id = route.query?.id
-  if(id) {
+  if (id) {
     const res = await getPictureVoByIdUsingGet({
-      id:id,
+      id: id,
     })
 
-    if (res.data.code === 0 && res.data.data){
+    if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       picture.value = data
       pictureForm.name = data.name

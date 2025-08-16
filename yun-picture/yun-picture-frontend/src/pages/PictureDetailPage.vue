@@ -128,6 +128,14 @@ const doDownload = () => {
 // 编辑
 const doEdit = () => {
   router.push('/add_picture?id=' + picture.value.id)
+  // 跳转时一定要携带 spaceId
+  router.push({
+    path: '/add_picture',
+    query: {
+      id: picture.value.id,
+      spaceId: picture.value.spaceId,
+    },
+  })
 }
 // 删除
 const doDelete = async () => {
