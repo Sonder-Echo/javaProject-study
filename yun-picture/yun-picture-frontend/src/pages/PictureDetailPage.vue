@@ -67,16 +67,20 @@
                 <DownloadOutlined />
               </template>
             </a-button>
+            <a-button v-if="canEdit" :icon="h(ShareAltOutlined)" type="primary" ghost @click="doShare">
+              分享
+            </a-button>
             <a-button v-if="canEdit" :icon="h(EditOutlined)" type="default" @click="doEdit">
-              编辑</a-button
-            >
-            <a-button v-if="canEdit" :icon="h(DeleteOutlined)" danger @click="doDelete"
-              >删除</a-button
-            >
+              编辑
+            </a-button>
+            <a-button v-if="canEdit" :icon="h(DeleteOutlined)" danger @click="doDelete">
+              删除
+            </a-button>
           </a-space>
         </a-card>
       </a-col>
     </a-row>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
@@ -84,10 +88,11 @@
 import { onMounted, ref, h, computed } from 'vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, DeleteOutlined, DownloadOutlined, ShareAltOutlined } from '@ant-design/icons-vue'
 import { downloadImage, formatSize, toHexColor } from '@/utils/indes.ts'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { useRouter } from 'vue-router'
+import ShareModal from '@/components/ShareModal.vue'
 
 interface Props {
   id: string | number
@@ -162,6 +167,19 @@ const doDelete = async () => {
     router.push('/')
   } else {
     message.error('删除失败，' + res.data.message)
+  }
+}
+
+// ----- 分享操作 -----
+const shareModalRef = ref()
+// 分享链接
+const shareLink = ref<string>()
+
+// 分享函数
+const doShare = () => {
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
+  if(shareModalRef.value){
+    shareModalRef.value.openModal()
   }
 }
 </script>
