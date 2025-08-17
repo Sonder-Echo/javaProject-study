@@ -30,6 +30,7 @@ import com.sonder.yunpicturebackend.service.PictureService;
 import com.sonder.yunpicturebackend.service.SpaceService;
 import com.sonder.yunpicturebackend.service.UserService;
 import com.sonder.yunpicturebackend.utils.ColorSimilarUtils;
+import com.sonder.yunpicturebackend.utils.ColorTransformUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -181,7 +182,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         picture.setPicHeight(uploadPictureResult.getPicHeight());
         picture.setPicScale(uploadPictureResult.getPicScale());
         picture.setPicFormat(uploadPictureResult.getPicFormat());
-        picture.setPicColor(uploadPictureResult.getPicColor());
+//        picture.setPicColor(uploadPictureResult.getPicColor());
+        picture.setPicColor(ColorTransformUtils.getStandardColor(uploadPictureResult.getPicColor()));
         picture.setUserId(loginUser.getId());
         //插入数据库之前补充审核参数
         this.fillReviewParams(picture, loginUser);

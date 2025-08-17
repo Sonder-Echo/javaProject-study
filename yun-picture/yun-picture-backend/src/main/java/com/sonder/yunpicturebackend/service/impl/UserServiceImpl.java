@@ -68,6 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
         user.setUserName("LaLa");
+        user.setUserAvatar("https://sonder-1367770210.cos.ap-guangzhou.myqcloud.com/test/%E6%B4%9B%E7%90%AA%E5%B8%8C.jpg");
         user.setUserRole(UserRoleEnum.USER.getValue());
         boolean saveResult = this.save(user);
         if(!saveResult){
