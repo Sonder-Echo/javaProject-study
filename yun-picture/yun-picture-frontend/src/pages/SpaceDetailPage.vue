@@ -7,6 +7,12 @@
         <a-button type="primary" :href="`/add_picture?spaceId=${id}`" target="_blank">
           + 创建图片
         </a-button>
+        <a-button
+          :icon="h(EditOutlined)"
+          @click="doBatchEdit"
+        >
+          批量编辑
+        </a-button>
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -20,14 +26,14 @@
     </a-flex>
     <div style="margin-bottom: 16px" />
     <!-- 搜索表单 -->
-    <PictureSearchForm :onSearch="onSearch"/>
+    <PictureSearchForm :onSearch="onSearch" />
     <div style="margin-bottom: 16px" />
     <!-- 按照颜色搜索，与其他搜索条件独立 -->
     <a-form-item label="按颜色搜索">
-      <color-picker format="hex" @pureColorChange="onColorChange"/>
+      <color-picker format="hex" @pureColorChange="onColorChange" />
     </a-form-item>
     <!-- 图片列表 -->
-    <PictureList :dataList="dataList" :loading="loading" :showOp="true" :onReload="fetchData"/>
+    <PictureList :dataList="dataList" :loading="loading" :showOp="true" :onReload="fetchData" />
     <!-- 分页 -->
     <a-pagination
       style="text-align: right"
@@ -36,20 +42,30 @@
       :total="total"
       @change="onPageChange"
     />
+    <BatchEditPictureModal
+      ref="batchEditPictureModalRef"
+      :spaceId="id"
+      :pictureList="dataList"
+      :onSuccess="onBatchEditPictureSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, reactive, h } from 'vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import { message } from 'ant-design-vue'
-import { listPictureVoByPageUsingPost, searchPictureByColorUsingPost } from '@/api/pictureController.ts'
+import {
+  listPictureVoByPageUsingPost,
+  searchPictureByColorUsingPost,
+} from '@/api/pictureController.ts'
 import { formatSize } from '@/utils/indes.ts'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
-import "vue3-colorpicker/style.css"
-
+import 'vue3-colorpicker/style.css'
+import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
+import { EditOutlined } from '@ant-design/icons-vue'
 
 interface Props {
   id: string | number
@@ -132,7 +148,6 @@ const onSearch = (newSearchParams: API.PictureQueryRequest) => {
   fetchData()
 }
 
-
 // 按照颜色搜索
 const onColorChange = async (color: string) => {
   loading.value = true
@@ -148,6 +163,21 @@ const onColorChange = async (color: string) => {
     message.error('数据获取失败，' + res.data.message)
   }
   loading.value = false
+}
+
+// -------- 批量编辑图片 --------
+const batchEditPictureModalRef = ref()
+
+// 批量编辑图片成功
+const handleBatchEditPictureSuccess = () => {
+  fetchData()
+}
+
+// 打开批量编辑图片模态框
+const doBatchEdit = () => {
+  if(batchEditPictureModalRef.value){
+    batchEditPictureModalRef.value.openModal()
+  }
 }
 </script>
 

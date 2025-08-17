@@ -1,6 +1,5 @@
 <template>
   <div>
-    <a-button type="primary" @click="showModal">Open Modal</a-button>
     <a-modal v-model:open="visible" title="分享图片" :footer="false" @cancle="closeModal">
       <h4>复制分享链接</h4>
       <a-typography-link copyable>
