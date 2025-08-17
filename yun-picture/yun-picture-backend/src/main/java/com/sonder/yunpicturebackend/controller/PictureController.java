@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.sonder.yunpicturebackend.annotation.AuthCheck;
+import com.sonder.yunpicturebackend.api.imagesearch.ImageSearchApiFacade;
+import com.sonder.yunpicturebackend.api.imagesearch.model.ImageSearchResult;
 import com.sonder.yunpicturebackend.common.BaseResponse;
 import com.sonder.yunpicturebackend.common.DeleteRequest;
 import com.sonder.yunpicturebackend.common.ResultUtils;
@@ -169,7 +171,7 @@ public class PictureController {
         // 空间权限校验
         Long spaceId = picture.getSpaceId();
         User loginUser = userService.getLoginUser(request);
-        if(spaceId != null){
+        if (spaceId != null) {
             pictureService.checkPictureAuth(loginUser, picture);
         }
         // 普通用户且并非图片拥有者只能查找已过审的图片
@@ -210,7 +212,7 @@ public class PictureController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 空间权限校验
         Long spaceId = pictureQueryRequest.getSpaceId();
-        if(spaceId == null){
+        if (spaceId == null) {
             // 公开图库
             pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
             pictureQueryRequest.setNullSpaceId(true);
@@ -219,7 +221,7 @@ public class PictureController {
             User loginUser = userService.getLoginUser(request);
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-            if(!loginUser.getId().equals(space.getUserId())){
+            if (!loginUser.getId().equals(space.getUserId())) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无空间权限");
             }
         }
@@ -236,7 +238,7 @@ public class PictureController {
     @Deprecated // todo 这部分代码用于公共空间，私有空间暂时不用，所以再开发私有空间期间暂时废弃
     @PostMapping("/list/page/vo/cache")
     public BaseResponse<Page<PictureVO>> listPictureVOByPageWithCache(@RequestBody PictureQueryRequest pictureQueryRequest,
-                                                             HttpServletRequest request) {
+                                                                      HttpServletRequest request) {
         long current = pictureQueryRequest.getCurrent();
         long size = pictureQueryRequest.getPageSize();
         // 限制爬虫
@@ -252,7 +254,7 @@ public class PictureController {
 
         // 1.先查找本地缓存
         String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);
-        if(cachedValue != null){
+        if (cachedValue != null) {
             // 如果缓存命中，缓存结果
             Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
             return ResultUtils.success(cachePage);
@@ -261,7 +263,7 @@ public class PictureController {
         ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
         cachedValue = opsForValue.get(cacheKey);
 
-        if(cachedValue != null){
+        if (cachedValue != null) {
             // 如果缓存命中，更新本地缓存，返回缓存结果
             LOCAL_CACHE.put(cacheKey, cachedValue);
             Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
@@ -327,11 +329,25 @@ public class PictureController {
     @PostMapping("/upload/batch")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Integer> uploadPictureByBatch(@RequestBody PictureUploadByBatchRequest pictureUploadByBatchRequest,
-                                                 HttpServletRequest request) {
+                                                      HttpServletRequest request) {
         ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         Integer uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(uploadCount);
+    }
+
+    /**
+     * 以图搜图
+     */
+    @PostMapping("/search/picture")
+    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(@RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
+        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+        Long pictureId = searchPictureByPictureRequest.getPictureId();
+        ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR);
+        Picture picture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(picture.getUrl());
+        return ResultUtils.success(resultList);
     }
 
 }
