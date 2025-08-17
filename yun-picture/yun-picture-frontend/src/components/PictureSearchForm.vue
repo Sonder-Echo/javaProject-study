@@ -62,17 +62,16 @@
         </a-space>
       </a-form-item>
     </a-form>
+
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
-import { PIC_REVIEW_STATUS_OPTIONS } from '@/constants/picture.ts'
-import type { RangeValue } from 'ant-design-vue/es/vc-picker/interface'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
-import { listPictureTagCategoryUsingGet } from '@/api/pictureController.ts'
-import * as sea from 'node:sea'
+import { listPictureTagCategoryUsingGet, listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+
 
 interface Props {
   onSearch?: (searchParams: API.PictureQueryRequest) => void
