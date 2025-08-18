@@ -631,14 +631,13 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 校验用户权限
         checkPictureAuth(loginUser, picture);
         // 创建扩图任务
-        CreateOutPaintingTaskRequest createOutPaintingTaskRequest = new CreateOutPaintingTaskRequest();
+        CreateOutPaintingTaskRequest taskRequest = new CreateOutPaintingTaskRequest();
         CreateOutPaintingTaskRequest.Input input = new CreateOutPaintingTaskRequest.Input();
         input.setImageUrl(picture.getUrl());
-        createOutPaintingTaskRequest.setInput(input);
-        createOutPaintingTaskRequest.setParameters(createOutPaintingTaskRequest.getParameters());
+        taskRequest.setInput(input);
+        BeanUtil.copyProperties(createPictureOutPaintingTaskRequest, taskRequest);
         // 创建任务
-        return aliYunAiApi.createOutPaintingTask(createOutPaintingTaskRequest);
-
+        return aliYunAiApi.createOutPaintingTask(taskRequest);
     }
 
     /**
