@@ -220,6 +220,23 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
     }
 
+    @Override
+    public List<Space> getSpaceRankAnalyze(SpaceRankAnalyzeRequest spaceRankAnalyzeRequest, User loginUser) {
+        ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+
+        // 检查权限，仅管理员可以查看
+        ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR);
+
+        // 构造查询条件
+        QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "spaceName", "spaceId", "totalSize")
+                .orderByDesc("totalSize")
+                .last("limit " + spaceRankAnalyzeRequest.getTopN()); // 获取前 N 个空间
+
+        // 查询并封装结果
+        return spaceService.list(queryWrapper);
+    }
+
     /**
      * 校验空间分析权限
      *
