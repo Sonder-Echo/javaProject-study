@@ -4,8 +4,10 @@ import com.sonder.yunpicturebackend.common.BaseResponse;
 import com.sonder.yunpicturebackend.common.ResultUtils;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
 import com.sonder.yunpicturebackend.service.UserService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -41,6 +44,21 @@ public class SpaceAnalyzeController {
         User loginUser = userService.getLoginUser(request);
         SpaceUsageAnalyzeResponse spaceUsageAnalyzeResponse = spaceAnalyzeService.getSpaceUsageAnalyze(spaceUsageAnalyzeRequest, loginUser);
         return ResultUtils.success(spaceUsageAnalyzeResponse);
+    }
+
+    /**
+     * 获取空间图片分类分析
+     *
+     * @param spaceCategoryAnalyzeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/category")
+    public BaseResponse<List<SpaceCategoryAnalyzeResponse>> getSpaceCategoryAnalyze(@RequestBody SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceCategoryAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceCategoryAnalyzeResponse> spaceCategoryAnalyzeResponse = spaceAnalyzeService.getSpaceCategoryAnalyze(spaceCategoryAnalyzeRequest, loginUser);
+        return ResultUtils.success(spaceCategoryAnalyzeResponse);
     }
 
 

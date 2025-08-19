@@ -14,6 +14,7 @@ import com.sonder.yunpicturebackend.mapper.SpaceMapper;
 import com.sonder.yunpicturebackend.model.dto.space.SpaceAddRequest;
 import com.sonder.yunpicturebackend.model.dto.space.SpaceQueryRequest;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceAnalyzeRequest;
+import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.entity.Picture;
 import com.sonder.yunpicturebackend.model.entity.Space;
@@ -21,6 +22,7 @@ import com.sonder.yunpicturebackend.model.entity.User;
 import com.sonder.yunpicturebackend.model.enums.SpaceLevelEnum;
 import com.sonder.yunpicturebackend.model.vo.SpaceVO;
 import com.sonder.yunpicturebackend.model.vo.UserVO;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
 import com.sonder.yunpicturebackend.service.PictureService;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
@@ -103,9 +105,31 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
             spaceUsageAnalyzeResponse.setCountUsageRatio(countUsageRatio);
             return spaceUsageAnalyzeResponse;
         }
+    }
 
+    @Override
+    public List<SpaceCategoryAnalyzeResponse> getSpaceCategoryAnalyze(SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, User loginUser) {
+        ThrowUtils.throwIf(spaceCategoryAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        // 校验权限
+        checkSpaceAnalyzeAuth(spaceCategoryAnalyzeRequest, loginUser);
+        // 构造查询条件
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        fillAnalyzeQueryWrapper(spaceCategoryAnalyzeRequest, queryWrapper);
 
-        // 2.校验权限
+        // 使用 Mybatis Plus 分组查询
+        queryWrapper.select("category", "count(*) as count", "sum(picSize) as totalSize")
+                .groupBy("category");
+
+        // 查询并转换结果
+        return pictureService.getBaseMapper().selectMaps(queryWrapper)
+                .stream()
+                .map(result -> {
+                    String category = (String) result.get("category");
+                    Long count = (Long) result.get("count");
+                    Long totalSize = (Long) result.get("totalSize");
+                    return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
+                })
+                .collect(Collectors.toList());
     }
 
     /**
