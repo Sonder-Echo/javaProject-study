@@ -13,10 +13,7 @@ import com.sonder.yunpicturebackend.model.dto.space.analyze.*;
 import com.sonder.yunpicturebackend.model.entity.Picture;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.*;
 import com.sonder.yunpicturebackend.service.PictureService;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
 import com.sonder.yunpicturebackend.service.SpaceService;
@@ -24,6 +21,7 @@ import com.sonder.yunpicturebackend.service.UserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,6 +175,49 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         return sizeRanges.entrySet().stream()
                 .map(entry -> new SpaceSizeAnalyzeResponse(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser) {
+        ThrowUtils.throwIf(spaceUserAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        // 校验权限
+        checkSpaceAnalyzeAuth(spaceUserAnalyzeRequest, loginUser);
+        // 构造查询条件
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        fillAnalyzeQueryWrapper(spaceUserAnalyzeRequest, queryWrapper);
+        // 补充用户 id 查询
+        Long userId = spaceUserAnalyzeRequest.getUserId();
+        queryWrapper.eq(ObjUtil.isNotNull(userId), "userId", userId);
+        // 补充分析维度：每日、每周、每月
+        String timeDimension = spaceUserAnalyzeRequest.getTimeDimension();
+        switch (timeDimension){
+            case "day":
+                queryWrapper.select("DATE_FORMAT(createTime, '%Y-%m-%d') as period", "count(*) as count");
+                break;
+            case "week":
+                queryWrapper.select("YEARWEEK(createTime) as period", "count(*) as count");
+                break;
+            case "month":
+                queryWrapper.select("DATE_FORMAT(createTime, '%Y-%m') as period", "count(*) as count");
+                break;
+            default:
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "不支持的时间维度");
+        }
+
+        // 分组排序
+        queryWrapper.groupBy("period").orderByAsc("period");
+
+        // 查询并封装结果
+        List<Map<String, Object>> queryResult = pictureService.getBaseMapper().selectMaps(queryWrapper);
+        return queryResult
+                .stream()
+                .map(result -> {
+                    String period = (String) result.get("period");
+                    Long count = (Long) result.get("count");
+                    return new SpaceUserAnalyzeResponse(period, count);
+                })
+                .collect(Collectors.toList());
+
     }
 
     /**

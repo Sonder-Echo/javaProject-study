@@ -4,15 +4,9 @@ import com.sonder.yunpicturebackend.common.BaseResponse;
 import com.sonder.yunpicturebackend.common.ResultUtils;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
-import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
-import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceSizeAnalyzeRequest;
-import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceTagAnalyzeRequest;
-import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
+import com.sonder.yunpicturebackend.model.dto.space.analyze.*;
 import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.*;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
 import com.sonder.yunpicturebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +90,23 @@ public class SpaceAnalyzeController {
         ThrowUtils.throwIf(spaceSizeAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         List<SpaceSizeAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceSizeAnalyze(spaceSizeAnalyzeRequest, loginUser);
+        return ResultUtils.success(resultList);
+    }
+
+    /**
+     * 获取空间用户上传行为分析
+     *
+     * @param spaceUserAnalyzeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/user")
+    public BaseResponse<List<SpaceUserAnalyzeResponse>> getSpaceUserAnalyze(
+            @RequestBody SpaceUserAnalyzeRequest spaceUserAnalyzeRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceUserAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceUserAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceUserAnalyze(spaceUserAnalyzeRequest, loginUser);
         return ResultUtils.success(resultList);
     }
 

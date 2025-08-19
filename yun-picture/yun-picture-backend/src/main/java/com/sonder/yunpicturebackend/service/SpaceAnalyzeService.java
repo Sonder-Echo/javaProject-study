@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.*;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
-import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.*;
 
 import java.util.List;
 
@@ -53,5 +50,9 @@ public interface SpaceAnalyzeService extends IService<Space> {
      */
     List<SpaceSizeAnalyzeResponse> getSpaceSizeAnalyze(SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, User loginUser);
 
+    /**
+     * 获取空间用户上传行为分析
+     */
+    List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, User loginUser);
 
 }
