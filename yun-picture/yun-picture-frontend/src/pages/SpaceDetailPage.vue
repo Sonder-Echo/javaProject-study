@@ -8,11 +8,15 @@
           + 创建图片
         </a-button>
         <a-button
-          :icon="h(EditOutlined)"
-          @click="doBatchEdit"
+          type="primary"
+          ghost
+          :icon="h(BarChartOutlined)"
+          :href="`/space_analyze?spaceId=${id}`"
+          target="_blank"
         >
-          批量编辑
+          空间分析
         </a-button>
+        <a-button :icon="h(EditOutlined)" @click="doBatchEdit"> 批量编辑</a-button>
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
@@ -65,7 +69,7 @@ import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, BarChartOutlined } from '@ant-design/icons-vue'
 
 interface Props {
   id: string | number
@@ -175,7 +179,7 @@ const handleBatchEditPictureSuccess = () => {
 
 // 打开批量编辑图片模态框
 const doBatchEdit = () => {
-  if(batchEditPictureModalRef.value){
+  if (batchEditPictureModalRef.value) {
     batchEditPictureModalRef.value.openModal()
   }
 }
@@ -183,5 +187,6 @@ const doBatchEdit = () => {
 
 <style scoped>
 #spaceDetailPage {
+  margin-bottom: 16px;
 }
 </style>

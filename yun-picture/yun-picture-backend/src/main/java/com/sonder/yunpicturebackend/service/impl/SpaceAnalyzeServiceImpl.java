@@ -111,8 +111,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
                 .stream()
                 .map(result -> {
                     String category = (String) result.get("category");
-                    Long count = (Long) result.get("count");
-                    Long totalSize = (Long) result.get("totalSize");
+                    Long count = ((Number) result.get("count")).longValue();
+                    Long totalSize = ((Number) result.get("totalSize")).longValue();
                     return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
                 })
                 .collect(Collectors.toList());
@@ -161,7 +161,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         List<Long> picSizeList = pictureService.getBaseMapper().selectObjs(queryWrapper)
                 .stream()
                 .filter(ObjUtil::isNotNull)
-                .map(size -> (Long) size)
+                .map(size -> ((Number) size).longValue())
                 .collect(Collectors.toList());
 
         // 定义分段范围，注意使用有序的 Map
@@ -212,8 +212,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         return queryResult
                 .stream()
                 .map(result -> {
-                    String period = (String) result.get("period");
-                    Long count = (Long) result.get("count");
+                    String period = result.get("period").toString();
+                    Long count = ((Number) result.get("count")).longValue();
                     return new SpaceUserAnalyzeResponse(period, count);
                 })
                 .collect(Collectors.toList());
@@ -229,7 +229,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
         // 构造查询条件
         QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id", "spaceName", "spaceId", "totalSize")
+        queryWrapper.select("id", "spaceName", "userId", "totalSize")
                 .orderByDesc("totalSize")
                 .last("limit " + spaceRankAnalyzeRequest.getTopN()); // 获取前 N 个空间
 
