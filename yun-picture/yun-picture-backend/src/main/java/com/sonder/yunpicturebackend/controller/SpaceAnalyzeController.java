@@ -5,10 +5,12 @@ import com.sonder.yunpicturebackend.common.ResultUtils;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
+import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceSizeAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceTagAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
 import com.sonder.yunpicturebackend.model.entity.User;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
+import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
@@ -78,6 +80,23 @@ public class SpaceAnalyzeController {
         User loginUser = userService.getLoginUser(request);
         List<SpaceTagAnalyzeResponse> spaceTagAnalyzeResponse = spaceAnalyzeService.getSpaceTagAnalyze(spaceTagAnalyzeRequest, loginUser);
         return ResultUtils.success(spaceTagAnalyzeResponse);
+    }
+
+    /**
+     * 获取空间图片大小分析
+     *
+     * @param spaceSizeAnalyzeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/size")
+    public BaseResponse<List<SpaceSizeAnalyzeResponse>> getSpaceSizeAnalyze(
+            @RequestBody SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceSizeAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceSizeAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceSizeAnalyze(spaceSizeAnalyzeRequest, loginUser);
+        return ResultUtils.success(resultList);
     }
 
 
