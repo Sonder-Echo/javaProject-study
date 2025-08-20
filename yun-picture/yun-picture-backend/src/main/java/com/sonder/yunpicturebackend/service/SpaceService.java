@@ -27,7 +27,7 @@ public interface SpaceService extends IService<Space> {
     long addSpace(SpaceAddRequest spaceAddRequest, User loginUser);
 
     /**
-     * 校验图片
+     * 校验空间
      *
      * @param space
      * @param add   是否为创建时校验
@@ -35,7 +35,7 @@ public interface SpaceService extends IService<Space> {
     void validSpace(Space space, boolean add);
 
     /**
-     * 获取图片包装类（单条）
+     * 获取空间包装类（单条）
      *
      * @param space
      * @param request
@@ -44,7 +44,7 @@ public interface SpaceService extends IService<Space> {
     SpaceVO getSpaceVO(Space space, HttpServletRequest request);
 
     /**
-     * 获取图片分页包装类（分页）
+     * 获取空间分页包装类（分页）
      *
      * @param spacePage
      * @param request
