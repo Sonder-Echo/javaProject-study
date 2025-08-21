@@ -149,7 +149,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if(currentUser == null || currentUser.getId() == null){
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "请先登录");
         }
         //从数据库中查询用户（追求性能的话可以直接返回）
         Long userId = currentUser.getId();
