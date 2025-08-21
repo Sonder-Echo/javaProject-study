@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonder.yunpicturebackend.exception.BusinessException;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicturebackend.manager.sharding.DynamicShardingManager;
 import com.sonder.yunpicturebackend.mapper.SpaceMapper;
 import com.sonder.yunpicturebackend.model.dto.space.SpaceAddRequest;
 import com.sonder.yunpicturebackend.model.dto.space.SpaceQueryRequest;
@@ -24,6 +25,8 @@ import com.sonder.yunpicturebackend.service.SpaceService;
 import com.sonder.yunpicturebackend.service.SpaceUserService;
 import com.sonder.yunpicturebackend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -52,6 +55,11 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
     @Resource
     private SpaceUserService spaceUserService;
+
+    // TODO: 可选 为了方便部署，注释掉分表
+//    @Resource
+//    @Lazy
+//    private DynamicShardingManager dynamicShardingManager;
 
     @Override
     public long addSpace(SpaceAddRequest spaceAddRequest, User loginUser) {
@@ -101,6 +109,8 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
                     result = spaceUserService.save(spaceUser);
                     ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "创建团队成员记录失败！");
                 }
+//                // 创建分表 （仅对团队空间生效）   TODO: 为方便部署，暂时不使用
+//                dynamicShardingManager.createSpacePictureTable(space);
                 // 返回创建的空间id
                 return space.getId();
             });
