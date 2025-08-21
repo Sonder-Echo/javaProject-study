@@ -13,6 +13,7 @@ import com.sonder.yunpicturebackend.constant.UserConstant;
 import com.sonder.yunpicturebackend.exception.BusinessException;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
 import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.sonder.yunpicturebackend.model.dto.space.*;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.User;
@@ -23,6 +24,7 @@ import com.sonder.yunpicturebackend.service.SpaceService;
 import com.sonder.yunpicturebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.DigestUtils;
@@ -46,6 +48,8 @@ public class SpaceController {
     private UserService userService;
     @Resource
     private SpaceService spaceService;
+    @Autowired
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
@@ -130,13 +134,16 @@ public class SpaceController {
         // 查询数据库
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
-        // 普通用户且并非空间拥有者只能查找自己的空间
-        User user = userService.getLoginUser(request);
-        if (!space.getUserId().equals(user.getId()) && !userService.isAdmin(user)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "仅允许查看自己的空间");
-        }
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
+//        // 普通用户且并非空间拥有者只能查找自己的空间
+//        if (!space.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+//            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "仅允许查看自己的空间");
+//        }
         // 获取封装类
-        return ResultUtils.success(spaceService.getSpaceVO(space, request));
+        return ResultUtils.success(spaceVO);
     }
 
     /**
