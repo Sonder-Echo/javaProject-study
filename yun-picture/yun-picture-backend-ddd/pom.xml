@@ -160,7 +160,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.sonder.yunpicturebackend.YunPictureBackendApplication</mainClass>
+                    <mainClass>com.sonder.yunpicture.YunPictureBackendApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

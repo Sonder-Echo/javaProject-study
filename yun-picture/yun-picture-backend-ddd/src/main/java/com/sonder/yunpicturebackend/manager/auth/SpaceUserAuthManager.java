@@ -8,11 +8,11 @@ import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserPermissionConsta
 import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserRole;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.SpaceUser;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.enums.SpaceRoleEnum;
 import com.sonder.yunpicturebackend.model.enums.SpaceTypeEnum;
 import com.sonder.yunpicturebackend.service.SpaceUserService;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +27,7 @@ import java.util.List;
 public class SpaceUserAuthManager {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     @Resource
     private SpaceUserService spaceUserService;
@@ -75,7 +75,7 @@ public class SpaceUserAuthManager {
         List<String> ADMIN_PERMISSIONS = getPermissionsByRole(SpaceRoleEnum.ADMIN.getValue());
         // 公共图库
         if (space == null) {
-            if (userService.isAdmin(loginUser)) {
+            if (loginUser.isAdmin()) {
                 return ADMIN_PERMISSIONS;
             }
             return Collections.singletonList(SpaceUserPermissionConstant.PICTURE_VIEW);
@@ -88,7 +88,7 @@ public class SpaceUserAuthManager {
         switch (spaceTypeEnum) {
             case PRIVATE:
                 // 私有空间，仅本人或管理员有所有权限
-                if (space.getUserId().equals(loginUser.getId()) || userService.isAdmin(loginUser)) {
+                if (space.getUserId().equals(loginUser.getId()) || loginUser.isAdmin()) {
                     return ADMIN_PERMISSIONS;
                 } else {
                     return new ArrayList<>();

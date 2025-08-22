@@ -1,6 +1,6 @@
 package com.sonder.yunpicturebackend.model.dto.space;
 
-import com.sonder.yunpicturebackend.common.PageRequest;
+import com.sonder.yunpicture.infrastructure.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

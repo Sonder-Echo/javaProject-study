@@ -1,8 +1,8 @@
 package com.sonder.yunpicturebackend.manager.upload;
 
 import cn.hutool.core.io.FileUtil;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

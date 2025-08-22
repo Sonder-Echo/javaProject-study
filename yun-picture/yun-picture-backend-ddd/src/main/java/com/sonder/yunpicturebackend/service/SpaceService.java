@@ -6,7 +6,7 @@ import com.sonder.yunpicturebackend.model.dto.space.SpaceAddRequest;
 import com.sonder.yunpicturebackend.model.dto.space.SpaceQueryRequest;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.vo.SpaceVO;
 
 import javax.servlet.http.HttpServletRequest;

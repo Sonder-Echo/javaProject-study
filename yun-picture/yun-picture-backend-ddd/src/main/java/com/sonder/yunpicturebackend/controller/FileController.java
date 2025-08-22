@@ -3,14 +3,13 @@ package com.sonder.yunpicturebackend.controller;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
-import com.sonder.yunpicturebackend.annotation.AuthCheck;
-import com.sonder.yunpicturebackend.common.BaseResponse;
-import com.sonder.yunpicturebackend.common.ResultUtils;
-import com.sonder.yunpicturebackend.constant.UserConstant;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.manager.CosManager;
-import com.sonder.yunpicturebackend.model.enums.UserRoleEnum;
+import com.sonder.yunpicture.infrastructure.annotation.AuthCheck;
+import com.sonder.yunpicture.infrastructure.common.BaseResponse;
+import com.sonder.yunpicture.infrastructure.common.ResultUtils;
+import com.sonder.yunpicture.domain.user.constant.UserConstant;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.api.CosManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.IOException;
 
 @Slf4j
 @RestController

@@ -1,6 +1,6 @@
 package com.sonder.yunpicturebackend.manager.websocket.model;
 
-import com.sonder.yunpicturebackend.model.vo.UserVO;
+import com.sonder.yunpicture.interfaces.vo.user.UserVO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

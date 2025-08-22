@@ -5,23 +5,22 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
-import com.sonder.yunpicturebackend.mapper.SpaceMapper;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
+import com.sonder.yunpicture.infrastructure.mapper.SpaceMapper;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.*;
-import com.sonder.yunpicturebackend.model.entity.Picture;
+import com.sonder.yunpicture.domain.picture.entity.Picture;
 import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.*;
-import com.sonder.yunpicturebackend.service.PictureService;
+import com.sonder.yunpicture.application.service.PictureApplicationService;
 import com.sonder.yunpicturebackend.service.SpaceAnalyzeService;
 import com.sonder.yunpicturebackend.service.SpaceService;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +35,13 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         implements SpaceAnalyzeService {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     @Resource
     private SpaceService spaceService;
 
     @Resource
-    private PictureService pictureService;
+    private PictureApplicationService pictureApplicationService;
 
     @Override
     public SpaceUsageAnalyzeResponse getSpaceUsageAnalyze(SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest, User loginUser) {
@@ -56,7 +55,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
             queryWrapper.select("picSize");
             // 补充查询范围
             fillAnalyzeQueryWrapper(spaceUsageAnalyzeRequest, queryWrapper);
-            List<Object> pictureObjList = pictureService.getBaseMapper().selectObjs(queryWrapper);
+            List<Object> pictureObjList = pictureApplicationService.getBaseMapper().selectObjs(queryWrapper);
             long usedSize = pictureObjList.stream().mapToLong(obj -> ((Long) obj)).sum();
             long usedCount = pictureObjList.size();
             // 封装返回结果
@@ -107,7 +106,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
                 .groupBy("category");
 
         // 查询并转换结果
-        return pictureService.getBaseMapper().selectMaps(queryWrapper)
+        return pictureApplicationService.getBaseMapper().selectMaps(queryWrapper)
                 .stream()
                 .map(result -> {
                     String category = (String) result.get("category");
@@ -129,7 +128,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
         // 查询所有符合条件的标签
         queryWrapper.select("tags");
-        List<String> tagsJsonList = pictureService.getBaseMapper().selectObjs(queryWrapper)
+        List<String> tagsJsonList = pictureApplicationService.getBaseMapper().selectObjs(queryWrapper)
                 .stream()
                 .filter(ObjUtil::isNotNull)
                 .map(Object::toString)
@@ -158,7 +157,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
         // 查询所有符合条件的图片大小
         queryWrapper.select("picSize");
-        List<Long> picSizeList = pictureService.getBaseMapper().selectObjs(queryWrapper)
+        List<Long> picSizeList = pictureApplicationService.getBaseMapper().selectObjs(queryWrapper)
                 .stream()
                 .filter(ObjUtil::isNotNull)
                 .map(size -> ((Number) size).longValue())
@@ -208,7 +207,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         queryWrapper.groupBy("period").orderByAsc("period");
 
         // 查询并封装结果
-        List<Map<String, Object>> queryResult = pictureService.getBaseMapper().selectMaps(queryWrapper);
+        List<Map<String, Object>> queryResult = pictureApplicationService.getBaseMapper().selectMaps(queryWrapper);
         return queryResult
                 .stream()
                 .map(result -> {
@@ -225,7 +224,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR);
 
         // 检查权限，仅管理员可以查看
-        ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR);
+        ThrowUtils.throwIf(!loginUser.isAdmin(), ErrorCode.NO_AUTH_ERROR);
 
         // 构造查询条件
         QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
@@ -248,7 +247,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         boolean queryAll = spaceAnalyzeRequest.isQueryAll();
         // 全空间分析或者公共图库权限校验，仅管理员可以访问
         if (queryAll || queryPublic) {
-            ThrowUtils.throwIf(!userService.isAdmin(loginUser), ErrorCode.NO_AUTH_ERROR);
+            ThrowUtils.throwIf(!loginUser.isAdmin(), ErrorCode.NO_AUTH_ERROR);
         } else {
             // 分析特定空间，仅本人或管理员可以访问
             Long spaceId = spaceAnalyzeRequest.getSpaceId();

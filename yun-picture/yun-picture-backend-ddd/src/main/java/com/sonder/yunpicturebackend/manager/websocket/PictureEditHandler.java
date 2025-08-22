@@ -10,8 +10,8 @@ import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditActionEnu
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditMessageTypeEnum;
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditRequestMessage;
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditResponseMessage;
-import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.domain.user.entity.User;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PictureEditHandler extends TextWebSocketHandler {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     // 每张图片的编辑状态，key: pictureId, value: 当前正在编辑的用户 ID
     private final Map<Long, Long> pictureEditingUsers = new ConcurrentHashMap<>();
@@ -64,7 +64,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
         pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.INFO.getValue());
         String message = String.format("用户 %s 加入编辑", user.getUserName());
         pictureEditResponseMessage.setMessage(message);
-        pictureEditResponseMessage.setUser(userService.getUserVO(user));
+        pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
         // 广播给所有用户
         broadcastToPicture(pictureId, pictureEditResponseMessage);
     }
@@ -107,7 +107,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
             pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.ENTER_EDIT.getValue());
             String message = String.format("用户 %s 开始编辑图片", user.getUserName());
             pictureEditResponseMessage.setMessage(message);
-            pictureEditResponseMessage.setUser(userService.getUserVO(user));
+            pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
             // 广播给所有用户
             broadcastToPicture(pictureId, pictureEditResponseMessage);
         }
@@ -139,7 +139,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
             String message = String.format("用户 %s 执行了 %s 操作", user.getUserName(), actionEnum.getText());
             pictureEditResponseMessage.setMessage(message);
             pictureEditResponseMessage.setEditAction(editAction);
-            pictureEditResponseMessage.setUser(userService.getUserVO(user));
+            pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
             // 广播给除了当前客户端之外的其他用户， 否则会造成重复编辑
             broadcastToPicture(pictureId, pictureEditResponseMessage, session);
         }
@@ -166,7 +166,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
             pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.EXIT_EDIT.getValue());
             String message = String.format("用户 %s 退出编辑图片", user.getUserName());
             pictureEditResponseMessage.setMessage(message);
-            pictureEditResponseMessage.setUser(userService.getUserVO(user));
+            pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
             broadcastToPicture(pictureId, pictureEditResponseMessage);
         }
     }
@@ -199,7 +199,7 @@ public class PictureEditHandler extends TextWebSocketHandler {
         pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.INFO.getValue());
         String message = String.format("用户 %s 离开编辑", user.getUserName());
         pictureEditResponseMessage.setMessage(message);
-        pictureEditResponseMessage.setUser(userService.getUserVO(user));
+        pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
         broadcastToPicture(pictureId, pictureEditResponseMessage);
     }
 

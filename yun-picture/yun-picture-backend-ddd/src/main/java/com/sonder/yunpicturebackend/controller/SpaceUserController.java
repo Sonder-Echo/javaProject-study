@@ -1,22 +1,22 @@
 package com.sonder.yunpicturebackend.controller;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.sonder.yunpicturebackend.common.BaseResponse;
-import com.sonder.yunpicturebackend.common.DeleteRequest;
-import com.sonder.yunpicturebackend.common.ResultUtils;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicture.infrastructure.common.BaseResponse;
+import com.sonder.yunpicture.infrastructure.common.DeleteRequest;
+import com.sonder.yunpicture.infrastructure.common.ResultUtils;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
 import com.sonder.yunpicturebackend.manager.auth.annotation.SaSpaceCheckPermission;
 import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserPermissionConstant;
 import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserAddRequest;
 import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserEditRequest;
 import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserQueryRequest;
 import com.sonder.yunpicturebackend.model.entity.SpaceUser;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.vo.SpaceUserVO;
 import com.sonder.yunpicturebackend.service.SpaceUserService;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +37,7 @@ public class SpaceUserController {
     private SpaceUserService spaceUserService;
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     /**
      * 添加成员到空间
@@ -131,7 +131,7 @@ public class SpaceUserController {
      */
     @PostMapping("/list/my")
     public BaseResponse<List<SpaceUserVO>> listMyTeamSpace(HttpServletRequest request) {
-        User loginUser = userService.getLoginUser(request);
+        User loginUser = userApplicationService.getLoginUser(request);
         SpaceUserQueryRequest spaceUserQueryRequest = new SpaceUserQueryRequest();
         spaceUserQueryRequest.setUserId(loginUser.getId());
         List<SpaceUser> spaceUserList = spaceUserService.list(

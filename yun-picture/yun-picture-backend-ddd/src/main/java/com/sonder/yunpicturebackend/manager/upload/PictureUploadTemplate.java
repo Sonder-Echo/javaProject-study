@@ -1,34 +1,23 @@
 package com.sonder.yunpicturebackend.manager.upload;
 
-import cn.hutool.Hutool;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.*;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.qcloud.cos.model.ciModel.persistence.ProcessResults;
-import com.sonder.yunpicturebackend.common.ResultUtils;
-import com.sonder.yunpicturebackend.config.CosClientConfig;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
-import com.sonder.yunpicturebackend.manager.CosManager;
+import com.sonder.yunpicture.infrastructure.config.CosClientConfig;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.api.CosManager;
 import com.sonder.yunpicturebackend.model.dto.file.UploadPictureResult;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.utils.DateUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

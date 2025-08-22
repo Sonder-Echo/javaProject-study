@@ -6,8 +6,8 @@ import com.sonder.yunpicturebackend.manager.websocket.PictureEditHandler;
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditMessageTypeEnum;
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditRequestMessage;
 import com.sonder.yunpicturebackend.manager.websocket.model.PictureEditResponseMessage;
-import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.domain.user.entity.User;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -26,7 +26,7 @@ public class PictureEditEventWorkHandler implements WorkHandler<PictureEditEvent
     private PictureEditHandler pictureEditHandler;
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     @Override
     public void onEvent(PictureEditEvent pictureEditEvent) throws Exception {
@@ -53,7 +53,7 @@ public class PictureEditEventWorkHandler implements WorkHandler<PictureEditEvent
                 PictureEditResponseMessage pictureEditResponseMessage = new PictureEditResponseMessage();
                 pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.ERROR.getValue());
                 pictureEditResponseMessage.setMessage("消息类型错误");
-                pictureEditResponseMessage.setUser(userService.getUserVO(user));
+                pictureEditResponseMessage.setUser(userApplicationService.getUserVO(user));
                 session.sendMessage(new TextMessage(JSONUtil.toJsonStr(pictureEditResponseMessage)));
                 break;
         }

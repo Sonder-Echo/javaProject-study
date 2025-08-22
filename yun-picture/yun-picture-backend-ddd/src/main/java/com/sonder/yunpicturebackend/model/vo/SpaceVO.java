@@ -1,5 +1,6 @@
 package com.sonder.yunpicturebackend.model.vo;
 
+import com.sonder.yunpicture.interfaces.vo.user.UserVO;
 import com.sonder.yunpicturebackend.model.entity.Space;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

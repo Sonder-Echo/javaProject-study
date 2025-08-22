@@ -4,7 +4,7 @@ package com.sonder.yunpicturebackend.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonder.yunpicturebackend.model.dto.space.analyze.*;
 import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.vo.space.analyze.*;
 
 import java.util.List;

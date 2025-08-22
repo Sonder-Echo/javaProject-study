@@ -1,42 +1,33 @@
 package com.sonder.yunpicturebackend.controller;
 
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.sonder.yunpicturebackend.annotation.AuthCheck;
-import com.sonder.yunpicturebackend.common.BaseResponse;
-import com.sonder.yunpicturebackend.common.DeleteRequest;
-import com.sonder.yunpicturebackend.common.ResultUtils;
-import com.sonder.yunpicturebackend.constant.UserConstant;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicture.infrastructure.annotation.AuthCheck;
+import com.sonder.yunpicture.infrastructure.common.BaseResponse;
+import com.sonder.yunpicture.infrastructure.common.DeleteRequest;
+import com.sonder.yunpicture.infrastructure.common.ResultUtils;
+import com.sonder.yunpicture.domain.user.constant.UserConstant;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
 import com.sonder.yunpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.sonder.yunpicturebackend.model.dto.space.*;
 import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.model.entity.User;
+import com.sonder.yunpicture.domain.user.entity.User;
 
 import com.sonder.yunpicturebackend.model.enums.SpaceLevelEnum;
 import com.sonder.yunpicturebackend.model.vo.SpaceVO;
 import com.sonder.yunpicturebackend.service.SpaceService;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,7 +36,7 @@ import java.util.stream.Collectors;
 public class SpaceController {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
     @Resource
     private SpaceService spaceService;
     @Autowired
@@ -54,7 +45,7 @@ public class SpaceController {
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
-        User loginUser = userService.getLoginUser(request);
+        User loginUser = userApplicationService.getLoginUser(request);
         long newId = spaceService.addSpace(spaceAddRequest, loginUser);
         return ResultUtils.success(newId);
     }
@@ -67,7 +58,7 @@ public class SpaceController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser(request);
+        User loginUser = userApplicationService.getLoginUser(request);
         Long id = deleteRequest.getId();
         // 判断数据是否存在
         Space oldSpace = spaceService.getById(id);
@@ -135,7 +126,7 @@ public class SpaceController {
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
         SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
-        User loginUser = userService.getLoginUser(request);
+        User loginUser = userApplicationService.getLoginUser(request);
         List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
         spaceVO.setPermissionList(permissionList);
 //        // 普通用户且并非空间拥有者只能查找自己的空间
@@ -195,7 +186,7 @@ public class SpaceController {
         space.setEditTime(new Date());
         // 数据校验
         spaceService.validSpace(space, false);
-        User loginUser = userService.getLoginUser(request);
+        User loginUser = userApplicationService.getLoginUser(request);
         // 判断是否存在
         long id = spaceEditRequest.getId();
         Space oldSpace = spaceService.getById(id);

@@ -1,17 +1,11 @@
 package com.sonder.yunpicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sonder.yunpicturebackend.model.dto.space.SpaceAddRequest;
-import com.sonder.yunpicturebackend.model.dto.space.SpaceQueryRequest;
 import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserAddRequest;
 import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserQueryRequest;
-import com.sonder.yunpicturebackend.model.entity.Space;
 import com.sonder.yunpicturebackend.model.entity.SpaceUser;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.sonder.yunpicturebackend.model.entity.User;
 import com.sonder.yunpicturebackend.model.vo.SpaceUserVO;
-import com.sonder.yunpicturebackend.model.vo.SpaceVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

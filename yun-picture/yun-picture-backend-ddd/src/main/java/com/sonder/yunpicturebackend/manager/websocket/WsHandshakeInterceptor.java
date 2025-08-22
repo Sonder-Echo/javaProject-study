@@ -4,17 +4,13 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.sonder.yunpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserPermissionConstant;
-import com.sonder.yunpicturebackend.model.dto.spaceuser.SpaceUserQueryRequest;
-import com.sonder.yunpicturebackend.model.entity.Picture;
+import com.sonder.yunpicture.domain.picture.entity.Picture;
 import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.model.entity.SpaceUser;
-import com.sonder.yunpicturebackend.model.entity.User;
-import com.sonder.yunpicturebackend.model.enums.SpaceRoleEnum;
+import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicturebackend.model.enums.SpaceTypeEnum;
-import com.sonder.yunpicturebackend.service.PictureService;
+import com.sonder.yunpicture.application.service.PictureApplicationService;
 import com.sonder.yunpicturebackend.service.SpaceService;
-import com.sonder.yunpicturebackend.service.SpaceUserService;
-import com.sonder.yunpicturebackend.service.UserService;
+import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -36,10 +32,10 @@ import java.util.Map;
 public class WsHandshakeInterceptor implements HandshakeInterceptor {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userApplicationService;
 
     @Resource
-    private PictureService pictureService;
+    private PictureApplicationService pictureApplicationService;
 
     @Resource
     private SpaceService spaceService;
@@ -69,13 +65,13 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
                 return false;
             }
             // 获取当前登录用户
-            User loginUser = userService.getLoginUser(httpServletRequest);
+            User loginUser = userApplicationService.getLoginUser(httpServletRequest);
             if (ObjUtil.isEmpty(loginUser)) {
                 log.error("WebSocket 连接建立失败，用户未登录");
                 return false;
             }
             // 校验用户是否有编辑当前图片的权限
-            Picture picture = pictureService.getById(pictureId);
+            Picture picture = pictureApplicationService.getById(pictureId);
             if (ObjUtil.isEmpty(picture)) {
                 log.error("WebSocket 连接建立失败，图片不存在");
                 return false;

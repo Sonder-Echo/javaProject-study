@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.sonder.yunpicturebackend.mapper.SpaceUserMapper">
+<mapper namespace="com.sonder.yunpicture.infrastructure.mapper.SpaceUserMapper">
 
     <resultMap id="BaseResultMap" type="com.sonder.yunpicturebackend.model.entity.SpaceUser">
         <id property="id" column="id"/>

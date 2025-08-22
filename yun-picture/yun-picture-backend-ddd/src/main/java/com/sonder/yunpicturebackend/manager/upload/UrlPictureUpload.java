@@ -6,9 +6,9 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
-import com.sonder.yunpicturebackend.exception.BusinessException;
-import com.sonder.yunpicturebackend.exception.ErrorCode;
-import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicture.infrastructure.exception.BusinessException;
+import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
+import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
