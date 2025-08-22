@@ -5,11 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import com.sonder.yunpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserPermissionConstant;
 import com.sonder.yunpicture.domain.picture.entity.Picture;
-import com.sonder.yunpicturebackend.model.entity.Space;
+import com.sonder.yunpicture.domain.space.entity.Space;
 import com.sonder.yunpicture.domain.user.entity.User;
-import com.sonder.yunpicturebackend.model.enums.SpaceTypeEnum;
+import com.sonder.yunpicture.domain.space.valueobject.SpaceTypeEnum;
 import com.sonder.yunpicture.application.service.PictureApplicationService;
-import com.sonder.yunpicturebackend.service.SpaceService;
+import com.sonder.yunpicture.application.service.SpaceApplicationService;
 import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
@@ -38,7 +38,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
     private PictureApplicationService pictureApplicationService;
 
     @Resource
-    private SpaceService spaceService;
+    private SpaceApplicationService spaceApplicationService;
 
     @Resource
     private SpaceUserAuthManager spaceUserAuthManager;
@@ -80,7 +80,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
             Space space = null;
             // 如果是团队空间并且有编辑者权限，才能建立链接
             if (spaceId != null) {
-                space = spaceService.getById(spaceId);
+                space = spaceApplicationService.getById(spaceId);
                 if (ObjUtil.isEmpty(space)) {
                     log.error("WebSocket 连接建立失败，空间不存在");
                     return false;

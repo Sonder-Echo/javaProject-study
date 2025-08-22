@@ -1,8 +1,8 @@
 package com.sonder.yunpicturebackend.manager.auth;
 
 import com.sonder.yunpicture.domain.picture.entity.Picture;
-import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.model.entity.SpaceUser;
+import com.sonder.yunpicture.domain.space.entity.Space;
+import com.sonder.yunpicture.domain.space.entity.SpaceUser;
 import lombok.Data;
 
 /**

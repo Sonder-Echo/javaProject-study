@@ -26,16 +26,15 @@ import com.sonder.yunpicturebackend.manager.auth.StpKit;
 import com.sonder.yunpicturebackend.manager.auth.annotation.SaSpaceCheckPermission;
 import com.sonder.yunpicturebackend.manager.auth.model.SpaceUserPermissionConstant;
 import com.sonder.yunpicture.domain.picture.entity.Picture;
-import com.sonder.yunpicturebackend.model.entity.Space;
+import com.sonder.yunpicture.domain.space.entity.Space;
 import com.sonder.yunpicture.domain.user.entity.User;
 import com.sonder.yunpicture.domain.picture.valueobject.PictureReviewStatusEnum;
 import com.sonder.yunpicture.interfaces.vo.picture.PictureTagCategory;
 import com.sonder.yunpicture.interfaces.vo.picture.PictureVO;
 import com.sonder.yunpicture.application.service.PictureApplicationService;
-import com.sonder.yunpicturebackend.service.SpaceService;
+import com.sonder.yunpicture.application.service.SpaceApplicationService;
 import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.DigestUtils;
@@ -58,7 +57,7 @@ public class PictureController {
     @Resource
     private PictureApplicationService pictureApplicationService;
     @Resource
-    private SpaceService spaceService;
+    private SpaceApplicationService spaceApplicationService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -186,7 +185,7 @@ public class PictureController {
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR);
             // 已经改为使用注解鉴权
             // pictureService.checkPictureAuth(loginUser, picture);
-            space = spaceService.getById(spaceId);
+            space = spaceApplicationService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         }
         // 普通用户且并非图片拥有者只能查找已过审的图片

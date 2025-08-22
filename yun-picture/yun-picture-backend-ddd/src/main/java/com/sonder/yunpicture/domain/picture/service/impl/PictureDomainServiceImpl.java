@@ -27,8 +27,8 @@ import com.sonder.yunpicturebackend.manager.upload.FilePictureUpload;
 import com.sonder.yunpicturebackend.manager.upload.PictureUploadTemplate;
 import com.sonder.yunpicturebackend.manager.upload.UrlPictureUpload;
 import com.sonder.yunpicturebackend.model.dto.file.UploadPictureResult;
-import com.sonder.yunpicturebackend.model.entity.Space;
-import com.sonder.yunpicturebackend.service.SpaceService;
+import com.sonder.yunpicture.domain.space.entity.Space;
+import com.sonder.yunpicture.application.service.SpaceApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -62,7 +62,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
     private UserApplicationService userApplicationService;
 
     @Resource
-    private SpaceService spaceService;
+    private SpaceApplicationService spaceApplicationService;
 
     @Resource
     private FilePictureUpload filePictureUpload;
@@ -86,7 +86,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
         // 校验空间是否存在
         Long spaceId = pictureUploadRequest.getSpaceId();
         if (spaceId != null) {
-            Space space = spaceService.getById(spaceId);
+            Space space = spaceApplicationService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
             // 改为使用统一的权限校验
 //            // 校验是否有空间的权限，仅空间的管理员才能上传
@@ -182,7 +182,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败，数据库操作失败");
             if (finalSpaceId != null) {
                 // 更新空间使用额度
-                boolean update = spaceService.lambdaUpdate()
+                boolean update = spaceApplicationService.lambdaUpdate()
                         .eq(Space::getId, finalSpaceId)
                         .setSql("totalSize = totalSize + " + picture.getPicSize())
                         .setSql("totalCount = totalCount + 1")
@@ -410,7 +410,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
             Long spaceId = oldPicture.getSpaceId();
             if (spaceId != null) {
                 // 更新空间使用额度，释放额度
-                boolean update = spaceService.lambdaUpdate()
+                boolean update = spaceApplicationService.lambdaUpdate()
                         .eq(Space::getId, spaceId)
                         .setSql("totalSize = totalSize - " + oldPicture.getPicSize())
                         .setSql("totalCount = totalCount - 1")
@@ -466,7 +466,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
         ThrowUtils.throwIf(spaceId == null || StrUtil.isBlank(picColor), ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH_ERROR);
         // 2.校验空间权限
-        Space space = spaceService.getById(spaceId);
+        Space space = spaceApplicationService.getById(spaceId);
         ThrowUtils.throwIf(space == null, ErrorCode.NO_AUTH_ERROR, "空间不存在");
         if (!space.getUserId().equals(loginUser.getId())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间访问权限");
@@ -515,7 +515,7 @@ public class PictureDomainServiceImpl implements PictureDomainService {
         ThrowUtils.throwIf(spaceId == null, ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH_ERROR);
         // 2.校验空间权限
-        Space space = spaceService.getById(spaceId);
+        Space space = spaceApplicationService.getById(spaceId);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         if (!space.getUserId().equals(loginUser.getId())) {
             ThrowUtils.throwIf(true, ErrorCode.NO_AUTH_ERROR, "没有权限编辑该空间下的图片");
