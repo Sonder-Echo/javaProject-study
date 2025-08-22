@@ -106,9 +106,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
             attributes.put("pictureId", Long.valueOf(pictureId)); // 转换为 Long 类型
 
         }
-
-
-        return false;
+        return true;
     }
 
     @Override
