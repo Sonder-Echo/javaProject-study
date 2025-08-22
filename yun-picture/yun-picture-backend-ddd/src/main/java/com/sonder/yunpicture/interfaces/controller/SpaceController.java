@@ -11,7 +11,7 @@ import com.sonder.yunpicture.infrastructure.exception.ErrorCode;
 import com.sonder.yunpicture.infrastructure.exception.ThrowUtils;
 import com.sonder.yunpicture.interfaces.assembler.SpaceAssembler;
 import com.sonder.yunpicture.interfaces.dto.space.*;
-import com.sonder.yunpicturebackend.manager.auth.SpaceUserAuthManager;
+import com.sonder.yunpicture.shared.auth.SpaceUserAuthManager;
 import com.sonder.yunpicture.domain.space.entity.Space;
 import com.sonder.yunpicture.domain.user.entity.User;
 
@@ -20,7 +20,6 @@ import com.sonder.yunpicture.interfaces.vo.space.SpaceVO;
 import com.sonder.yunpicture.application.service.SpaceApplicationService;
 import com.sonder.yunpicture.application.service.UserApplicationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

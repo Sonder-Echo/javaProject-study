@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 // exclude = {ShardingSphereAutoConfiguration.class} 代表移除分库分表配置
 @SpringBootApplication(exclude = {ShardingSphereAutoConfiguration.class})
 @EnableAsync
-@MapperScan("com.sonder.yunpicturebackend.mapper")
+@MapperScan("com.sonder.yunpicture.infrastructure.mapper")
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class YunPictureBackendApplication {
 

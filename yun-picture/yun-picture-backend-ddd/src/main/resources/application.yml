@@ -56,7 +56,7 @@ spring:
             type: CLASS_BASED
             props:
               strategy: standard
-              algorithmClassName: com.sonder.yunpicturebackend.manager.sharding.PictureShardingAlgorithm
+              algorithmClassName: com.sonder.yunpicture.shared.sharding.PictureShardingAlgorithm
     props:
       # 打印执行的 sql 语句，开发环境开启用于调试
       sql-show: true
@@ -86,7 +86,7 @@ knife4j:
 #        group-name: "默认分组"
         api-rule: package
         api-rule-resources:
-          - com.sonder.yunpicturebackend.controller
+          - com.sonder.yunpicture.interfaces.controller
 ## 对象存储配置（需要从腾讯云获取）
 #cos:
 #  client:
