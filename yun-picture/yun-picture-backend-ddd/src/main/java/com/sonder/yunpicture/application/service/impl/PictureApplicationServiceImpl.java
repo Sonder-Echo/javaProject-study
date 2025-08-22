@@ -40,6 +40,7 @@ public class PictureApplicationServiceImpl extends ServiceImpl<PictureMapper, Pi
     @Resource
     private PictureDomainService pictureDomainService;
 
+    @Resource
     private UserApplicationService userApplicationService;
 
     @Override
