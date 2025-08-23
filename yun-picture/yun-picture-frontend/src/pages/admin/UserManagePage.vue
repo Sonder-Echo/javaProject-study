@@ -28,6 +28,9 @@
           <div v-if="record.userRole === 'admin'">
             <a-tag color="green">管理员</a-tag>
           </div>
+          <div v-else-if="record.userRole === 'vip'">
+            <a-tag color="black">vip 用户</a-tag>
+          </div>
           <div v-else>
             <a-tag color="blue">普通用户</a-tag>
           </div>
