@@ -18,7 +18,7 @@
         />
       </a-col>
       <!-- 用户信息展示 -->
-      <a-col flex="150px">
+      <a-col flex="180px">
         <div class="user-login-status">
           <div v-if="loginUserStore.loginUser.id">
             <a-dropdown>
@@ -29,7 +29,19 @@
                     'https://sonder-java-ai.oss-cn-beijing.aliyuncs.com/2025/06/4ea73cc9-0893-43b3-9d97-54b34cb83404.jpg'
                   "
                 />
-                {{ loginUserStore.loginUser.userName ?? 'LaLa' }}
+                <div class="user-info">
+                  <div class="username">
+                    {{ loginUserStore.loginUser.userName ?? 'LaLa' }}
+                    <!-- VIP标识 -->
+                    <span v-if="loginUserStore.loginUser.userRole === 'vip'" class="vip-badge">
+                      <crown-filled class="vip-icon" />
+                    </span>
+                    <!-- 管理员标识 -->
+                    <span v-if="loginUserStore.loginUser.userRole === 'admin'" class="admin-badge">
+                      <security-scan-filled class="admin-icon" />
+                    </span>
+                  </div>
+                </div>
               </a-space>
               <template #overlay>
                 <a-menu>
@@ -58,7 +70,13 @@
 
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
+import {
+  HomeOutlined,
+  LogoutOutlined,
+  UserOutlined,
+  CrownFilled,
+  SecurityScanFilled
+} from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -174,5 +192,33 @@ const doLogout = async () => {
 
 .logo {
   height: 48px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.username {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.vip-badge, .admin-badge {
+  margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.vip-icon {
+  color: #ffc53d;
+  font-size: 14px;
+}
+
+.admin-icon {
+  color: #1890ff;
+  font-size: 14px;
 }
 </style>
