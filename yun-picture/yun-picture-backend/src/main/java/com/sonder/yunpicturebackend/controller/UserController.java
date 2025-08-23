@@ -166,4 +166,20 @@ public class UserController {
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
     }
+
+    /**
+     * 兑换会员
+     */
+    @PostMapping("/exchange/vip")
+    public BaseResponse<Boolean> exchangeVip(@RequestBody VipExchangeRequest vipExchangeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(vipExchangeRequest == null, ErrorCode.PARAMS_ERROR);
+        String vipCode = vipExchangeRequest.getVipCode();
+        User loginUser = userService.getLoginUser(request);
+        // 管理员无需兑换
+        if (loginUser.getUserRole().equals(UserConstant.ADMIN_ROLE)) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "管理员无需兑换");
+        }
+        boolean result = userService.exchangeVip(loginUser, vipCode);
+        return ResultUtils.success(result);
+    }
 }

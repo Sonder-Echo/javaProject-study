@@ -12,6 +12,9 @@
             <result property="userAvatar" column="userAvatar" />
             <result property="userProfile" column="userProfile" />
             <result property="userRole" column="userRole" />
+            <result property="vipExpireTime" column="vipExpireTime" />
+            <result property="vipCode" column="vipCode" />
+            <result property="vipNumber" column="vipNumber" />
             <result property="editTime" column="editTime" />
             <result property="createTime" column="createTime" />
             <result property="updateTime" column="updateTime" />
