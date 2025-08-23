@@ -8,10 +8,7 @@ import "ant-design-vue/dist/reset.css";
 import "@/access.ts"
 import VueCropper from 'vue-cropper';
 import 'vue-cropper/dist/index.css'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'  // 引入 dayjs 中文语言包
 
-dayjs.locale('zh-cn') // 设置 dayjs 为中文
 
 const app = createApp(App)
 
