@@ -4,16 +4,25 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectRequest;
 import com.sonder.yunpicturebackend.constant.UserConstant;
 import com.sonder.yunpicturebackend.exception.BusinessException;
 import com.sonder.yunpicturebackend.exception.ErrorCode;
+import com.sonder.yunpicturebackend.exception.ThrowUtils;
+import com.sonder.yunpicturebackend.manager.CosManager;
 import com.sonder.yunpicturebackend.manager.auth.StpKit;
+import com.sonder.yunpicturebackend.manager.upload.FilePictureUpload;
+import com.sonder.yunpicturebackend.manager.upload.PictureUploadTemplate;
+import com.sonder.yunpicturebackend.model.dto.file.UploadPictureResult;
+import com.sonder.yunpicturebackend.model.dto.user.UserInfoUpdateRequest;
 import com.sonder.yunpicturebackend.model.dto.user.UserQueryRequest;
 import com.sonder.yunpicturebackend.model.dto.user.UserRegisterRequest;
 import com.sonder.yunpicturebackend.model.dto.user.VipCode;
@@ -30,10 +39,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -53,6 +64,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
+
+    @javax.annotation.Resource
+    private CosManager cosManager;
+
+    @javax.annotation.Resource
+    private FilePictureUpload filePictureUpload;
 
     @Override
     public Long userRegister(UserRegisterRequest userRegisterRequest) {
@@ -332,6 +349,59 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     // endregion ----------------- 会员兑换功能部分结束 -----------------
+
+    // region ----------------- 以下代码为用户修改个人信息功能 -----------------
+    @Override
+    public void updateUserInfo(UserInfoUpdateRequest userInfoUpdateRequest, HttpServletRequest request) {
+        // 校验参数
+        ThrowUtils.throwIf(userInfoUpdateRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = this.getLoginUser(request);
+
+        String userName = StrUtil.blankToDefault(StrUtil.trim(userInfoUpdateRequest.getUserName()), loginUser.getUserName());
+        String userProfile = userInfoUpdateRequest.getUserProfile();
+
+        ThrowUtils.throwIf(StrUtil.length(userName) > 50, ErrorCode.PARAMS_ERROR, "昵称过长");
+
+        // 更新用户信息
+        User updateUser = new User();
+        updateUser.setId(loginUser.getId());
+        updateUser.setUserName(userName);
+        updateUser.setUserProfile(userProfile);
+        updateUser.setEditTime(new Date());
+        updateUser.setUpdateTime(new Date());
+        boolean ok = this.updateById(updateUser);
+        ThrowUtils.throwIf(!ok, ErrorCode.OPERATION_ERROR, "更新失败");
+    }
+
+    @Override
+    public String uploadAvatar(MultipartFile file, HttpServletRequest request) {
+        ThrowUtils.throwIf(file == null || file.isEmpty(), ErrorCode.PARAMS_ERROR, "头像不能为空");
+        User loginUser = getLoginUser(request);
+
+        // 校验文件类型与大小（示例：5MB，图片后缀）
+        String originalName = file.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(originalName);
+        ThrowUtils.throwIf(!StrUtil.equalsAnyIgnoreCase(suffix, "jpg", "jpeg", "png", "webp"),
+                ErrorCode.PARAMS_ERROR, "仅支持图片");
+        ThrowUtils.throwIf(file.getSize() > 5 * 1024 * 1024, ErrorCode.PARAMS_ERROR, "头像不能超过 5MB");
+
+        // 路径：userAvatar/{uid}/{uuid}.{ext}
+        String uploadPathPrefix = String.format("public/%s/userAvatar", loginUser.getId());
+
+        // === 上传到 COS ===
+        PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
+        UploadPictureResult uploadPictureResult = pictureUploadTemplate.uploadPicture(file, uploadPathPrefix);
+
+        // 写回用户表
+        User updateUserAvatar = new User();
+        updateUserAvatar.setId(loginUser.getId());
+        updateUserAvatar.setUserAvatar(uploadPictureResult.getUrl());
+        boolean ok = this.updateById(updateUserAvatar);
+        ThrowUtils.throwIf(!ok, ErrorCode.OPERATION_ERROR, "更新头像失败");
+
+        return updateUserAvatar.getUserAvatar();
+    }
+    // endregion ----------------- 用户修改个人信息功能结束 -----------------
 }
 
 

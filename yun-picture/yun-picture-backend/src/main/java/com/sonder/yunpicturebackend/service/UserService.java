@@ -1,12 +1,14 @@
 package com.sonder.yunpicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.sonder.yunpicturebackend.model.dto.user.UserInfoUpdateRequest;
 import com.sonder.yunpicturebackend.model.dto.user.UserQueryRequest;
 import com.sonder.yunpicturebackend.model.dto.user.UserRegisterRequest;
 import com.sonder.yunpicturebackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonder.yunpicturebackend.model.vo.LoginUserVO;
 import com.sonder.yunpicturebackend.model.vo.UserVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -96,5 +98,20 @@ public interface UserService extends IService<User> {
      * 用户兑换会员 （会员码兑换）
      */
     boolean exchangeVip(User user, String vipCode);
+
+    /**
+     * 用户更新个人信息
+     * @param req
+     * @param request
+     */
+    void updateUserInfo(UserInfoUpdateRequest userInfoUpdateRequest, HttpServletRequest request);
+
+    /**
+     * 用户上传头像
+     * @param file
+     * @param request
+     * @return
+     */
+    String uploadAvatar(MultipartFile file, HttpServletRequest request);
 
 }

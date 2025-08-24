@@ -17,7 +17,9 @@ import com.sonder.yunpicturebackend.model.vo.LoginUserVO;
 import com.sonder.yunpicturebackend.model.vo.UserVO;
 import com.sonder.yunpicturebackend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -182,4 +184,34 @@ public class UserController {
         boolean result = userService.exchangeVip(loginUser, vipCode);
         return ResultUtils.success(result);
     }
+
+    /**
+     * 用户更新个人信息
+     * @param userInfoUpdateRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/info/update")
+    public BaseResponse<Boolean> updateUserInfo(@RequestBody UserInfoUpdateRequest userInfoUpdateRequest,
+                                                 HttpServletRequest request) {
+        ThrowUtils.throwIf(userInfoUpdateRequest == null, ErrorCode.PARAMS_ERROR);
+        userService.updateUserInfo(userInfoUpdateRequest, request);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 用户更新个人头像
+     * @param file
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "/avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaseResponse<String> uploadAvatar(@RequestPart("file") MultipartFile file,
+                                             HttpServletRequest request) {
+        ThrowUtils.throwIf(file == null, ErrorCode.PARAMS_ERROR);
+        String url = userService.uploadAvatar(file, request);
+        return ResultUtils.success(url);
+    }
+
+
 }

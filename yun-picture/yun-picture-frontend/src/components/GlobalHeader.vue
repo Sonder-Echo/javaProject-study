@@ -46,8 +46,14 @@
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
-                    <router-link to="/my_space">
+                    <router-link to="/my_info">
                       <UserOutlined />
+                      个人信息
+                    </router-link>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <router-link to="/my_space">
+                      <PictureOutlined />
                       我的空间
                     </router-link>
                   </a-menu-item>
@@ -75,7 +81,8 @@ import {
   LogoutOutlined,
   UserOutlined,
   CrownFilled,
-  SecurityScanFilled
+  SecurityScanFilled,
+  PictureOutlined
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -83,6 +90,7 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { userLogoutUsingPost } from '@/api/userController.ts'
 
 const loginUserStore = useLoginUserStore()
+
 
 // 未经过滤的菜单项
 const originItems = [
@@ -206,7 +214,8 @@ const doLogout = async () => {
   font-weight: 500;
 }
 
-.vip-badge, .admin-badge {
+.vip-badge,
+.admin-badge {
   margin-left: 4px;
   display: inline-flex;
   align-items: center;

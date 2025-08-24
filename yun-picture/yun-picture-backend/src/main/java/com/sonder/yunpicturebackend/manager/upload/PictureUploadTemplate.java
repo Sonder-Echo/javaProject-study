@@ -47,16 +47,16 @@ public abstract class PictureUploadTemplate {
     /**
      * 上传图片
      *
-     * @param imputSource      文件
+     * @param inputSource      文件
      * @param uploadPathPrefix 上传路径前缀
      * @return
      */
-    public UploadPictureResult uploadPicture(Object imputSource, String uploadPathPrefix) {
+    public UploadPictureResult uploadPicture(Object inputSource, String uploadPathPrefix) {
         // 1. 校验图片
-        validPicture(imputSource);
+        validPicture(inputSource);
         // 2. 图片上传地址
         String uuid = RandomUtil.randomString(16); // 随机生成一个16位字符串
-        String originalFilename = getOriginFilename(imputSource);
+        String originalFilename = getOriginFilename(inputSource);
         // 自己拼接文件上传路径，而不是使用原始文件名称，可以增强安全性
         String uploadFilename = String.format("%s_%s.%s", DateUtil.formatDate(new Date()), uuid,
                 FileUtil.getSuffix(originalFilename)); // 生成上传的文件名,加入时间戳和随机字符串，后缀不变
@@ -67,7 +67,7 @@ public abstract class PictureUploadTemplate {
             // 3. 创建临时文件，获取文件到服务器
             file = File.createTempFile(uploadPath, null);
             // 处理文件来源
-            processFile(imputSource, file);
+            processFile(inputSource, file);
             // 4. 上传文件到对象存储
             PutObjectResult putObjectResult = cosManager.putPictureObject(uploadPath, file);
             // 5. 获取图片信息对象，封装结果

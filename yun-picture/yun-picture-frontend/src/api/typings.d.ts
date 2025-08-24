@@ -250,6 +250,9 @@ declare namespace API {
     userName?: string
     userProfile?: string
     userRole?: string
+    vipCode?: string
+    vipExpireTime?: string
+    vipNumber?: number
   }
 
   type Output = {
@@ -673,6 +676,11 @@ declare namespace API {
     userName?: string
     userProfile?: string
     userRole?: string
+  }
+
+  type UserInfoUpdateRequest = {
+    userName?: string
+    userProfile?: string
   }
 
   type UserLoginRequest = {
